@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas El Volcan - Realizar Pedido</title>
+    <link rel="stylesheet" href="../Style/contacto.css">
+</head>
+<body>
+
+    <section class="container">
+        <header>
+            <a href="../index.html" class="logo-container">
+                <img src="../contacto/ElVolcan.jpeg" alt="Logo Gas El Volcan" class="logo-img">
+            </a>
+            <h1>Catálogo y Pedido de Gas</h1>
+            <p>Selecciona tu cilindro y completa tus datos de entrega en Chillán</p>
+        </header>
+
+        <main>
+            <form id="formularioPedido">
+                <div class="form-group">
+                    <label for="cilindro">Selecciona el tipo de cilindro:</label>
+                    <select id="cilindro" name="cilindro">
+                        <option value="">-- Elige una opción --</option>
+                        <option value="5kg">Cilindro GLP 5 kg - $6.500</option>
+                        <option value="11kg">Cilindro GLP 11 kg - $12.000</option>
+                        <option value="15kg">Cilindro GLP 15 kg - $16.000</option>
+                        <option value="45kg">Cilindro GLP 45 kg - $45.000</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidad">Cantidad:</label>
+                    <input type="text" id="cantidad" name="cantidad" placeholder="Ej: 1, 2, 3...">
+                </div>
+
+                <div class="form-group">
+                    <label for="nombreCliente">Nombre completo:</label>
+                    <input type="text" id="nombreCliente" name="nombre" placeholder="Tu nombre">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefonoCliente">Teléfono de contacto:</label>
+                    <input type="tel" id="telefonoCliente" name="telefono" placeholder="Ej: 912345678">
+                </div>
+
+                <div class="form-group">
+                    <label for="zonaComuna">Comuna / Sector de entrega:</label>
+                    <select id="zonaComuna" name="zonaComuna">
+                        <option value="chillan-centro">Chillán Centro</option>
+                        <option value="chillan-viejo">Chillán Viejo</option>
+                        <option value="san-ignacio">San Ignacio / Rural</option>
+                        <option value="pinto">Pinto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="direccionEntrega">Dirección exacta:</label>
+                    <textarea id="direccionEntrega" name="direccion" placeholder="Calle, número, pasaje o referencia..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="metodoPago">Método de pago:</label>
+                    <select id="metodoPago" name="metodoPago">
+                        <option value="efectivo">Efectivo al repartidor</option>
+                        <option value="transferencia">Transferencia bancaria</option>
+                    </select>
+                </div>
+
+                <button type="submit">Solicitar Pedido</button>
+            </form>
+        </main>
+    </section>
+
+</body>
+</html>
