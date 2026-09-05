@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Consulta el estado de tu pedido de Gas El Volcán.">
+    <title>Rastrea tu pedido | Gas El Volcán</title>
+    <link rel="stylesheet" href="css/rastreo.css">
+</head>
+<body>
+    <header class="site-header" aria-label="Encabezado">
+        <a class="brand" href="../index.html" aria-label="Ir al inicio de Gas El Volcán">
+            <img src="../contacto/ElVolcan.jpeg" alt="Logo de Gas El Volcán">
+            <span>Gas El Volcán</span>
+        </a>
+        <a class="help-link" href="../contacto/contacto.html">¿Necesitas ayuda?</a>
+    </header>
+
+    <main>
+        <section class="hero" aria-labelledby="page-title">
+            <p class="eyebrow">SEGUIMIENTO EN LÍNEA</p>
+            <h1 id="page-title">Rastrea tu pedido</h1>
+            <p>Revisa aquí el estado de tu pedido actual en tiempo real.</p>
+        </section>
+
+        <section class="tracker-card" aria-label="Estado de tu pedido">
+            <div id="tracking-result" class="tracking-result">
+                <div class="order-summary">
+                    <div>
+                        <h2 id="order-status">¡Tu pedido está en camino!</h2>
+                        <p class="delivery-time">Llegará aproximadamente entre <strong>18:30 y 19:00 hrs.</strong></p>
+                    </div>
+                    <span class="status-pill"><span></span> En reparto</span>
+                </div>
+
+                <div class="map-panel" aria-label="Ubicación estimada de tu pedido">
+                    <div class="map-grid"></div>
+                    <div class="road road-one"></div>
+                    <div class="road road-two"></div>
+                    <div class="home-pin" aria-hidden="true">⌂</div>
+                    <div class="delivery-pin" aria-hidden="true">🚚</div>
+                    <p class="map-caption">El repartidor se encuentra a 8 minutos de tu dirección</p>
+                </div>
+
+                <ol class="timeline" aria-label="Estado del pedido">
+                    <li class="complete">
+                        <span class="timeline-icon">✓</span>
+                        <div><strong>Pedido confirmado</strong><small>Hoy, 17:42 hrs.</small></div>
+                    </li>
+                    <li class="complete">
+                        <span class="timeline-icon">✓</span>
+                        <div><strong>Pedido preparado</strong><small>Hoy, 18:03 hrs.</small></div>
+                    </li>
+                    <li class="active">
+                        <span class="timeline-icon">●</span>
+                        <div><strong>En camino a tu domicilio</strong><small>Actualizado hace un momento</small></div>
+                    </li>
+                    <li>
+                        <span class="timeline-icon"></span>
+                        <div><strong>Pedido entregado</strong><small>Próximamente</small></div>
+                    </li>
+                </ol>
+
+                <aside class="delivery-details" aria-label="Detalles de entrega">
+                    <div class="gas-icon">♨</div>
+                    <div><span>DETALLE DE ENTREGA</span><strong>1 balón de gas de 15 kg</strong><p>Pago al recibir: efectivo, tarjeta o transferencia</p></div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer>Gas El Volcán · Entregas seguras y rápidas</footer>
+</body>
+</html>
