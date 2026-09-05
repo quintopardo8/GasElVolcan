@@ -49,8 +49,12 @@ button:hover{
     margin-top: 0;
 }
 
-imput{
-    border: 10px solid;
+input{
+    border: 1px solid;
     padding: 9px 14px 5px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #F0F5FF;
+    
 }
 
