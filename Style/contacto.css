@@ -178,3 +178,56 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: var(--btn-hover);
 }
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 16px;
+    display: block;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+.is-valid {
+    border-color: #28a745 !important;
+}
+
+.panel-exito {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    color: #166534;
+}
+
+.panel-exito h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #15803d;
+}
+
+.panel-exito p {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #14532d;
+}

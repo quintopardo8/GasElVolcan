@@ -66,3 +66,21 @@ export function numeroRango(valor, min, max, mensaje) {
 
   return null;
 }
+
+export function validarCilindro(valor) {
+  const cilindrosValidos = ["5kg", "11kg", "15kg", "45kg"];
+  
+  const errorObligatorio = obligatorio(valor, "Debes seleccionar un tipo de cilindro");
+  if (errorObligatorio) return errorObligatorio;
+
+  return cilindrosValidos.includes(valor)
+    ? null
+    : "El tipo de cilindro seleccionado no es válido";
+}
+
+export function validarCantidad(valor) {
+  return (
+    obligatorio(valor, "Debes ingresar o seleccionar la cantidad") ||
+    numeroRango(valor, 1, 10, "La cantidad debe ser entre 1 y 10 cilindros")
+  );
+}
