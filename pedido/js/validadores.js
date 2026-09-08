@@ -1,0 +1,68 @@
+export function estaVacio(valor){
+    if(valor === null || valor === undefined){
+        return true;
+    }
+    if(typeof valor === "boolean"){
+        return false;
+    }
+    return String(valor).trim()==="";
+}
+
+export function obligatorio(valor, mensaje="Este campo es obligatorio"){
+    return estaVacio(valor) ? mensaje : null;
+}
+
+export function longitudMinima(valor, minimo, mensaje){
+    if(estaVacio(valor)){
+        return null;
+    }
+    const texto = String(valor).trim();
+    return texto.length < minimo
+        ? mensaje || `Debe tener al menos ${minimo} caracteres`
+        : null;
+}
+
+export function longitudMaxima(valor, maximo, mensaje){
+    if(estaVacio(valor)){
+        return null;
+    }
+    const texto = String(valor).trim();
+    return texto.length > maximo   
+        ? mensaje || `No puede superar ${maximo} caracteres`
+        : null;
+}
+
+export function soloLetras(valor, mensaje = "Usa solo letras y espacios") {
+  if (estaVacio(valor)) {
+    return null;
+  }
+  const patronLetras = /^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ\s]+$/;
+  return patronLetras.test(String(valor).trim()) ? null : mensaje;
+}
+
+export function telefonoChileno(
+  valor,
+  mensaje = "Ingresa un celular chileno válido (ej: 9 1234 5678)"
+) {
+  if (estaVacio(valor)) {
+    return null;
+  }
+  const digitos = String(valor).replace(/\D/g, "");
+  const esCelularLocal = digitos.length === 9 && digitos.startsWith("9");
+  const esCelularInternacional = digitos.length === 11 && digitos.startsWith("569");
+
+  return esCelularLocal || esCelularInternacional ? null : mensaje;
+}
+
+export function numeroRango(valor, min, max, mensaje) {
+  if (estaVacio(valor)) {
+    return null;
+  }
+  const numero = Number(valor);
+
+  if (Number.isNaN(numero) || !Number.isInteger(numero) || numero < min || numero > max) {
+    return mensaje || `Debe ser un número entero entre ${min} y ${max}`;
+  }
+
+  return null;
+}
