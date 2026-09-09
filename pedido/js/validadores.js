@@ -84,3 +84,49 @@ export function validarCantidad(valor) {
     numeroRango(valor, 1, 10, "La cantidad debe ser entre 1 y 10 cilindros")
   );
 }
+
+export function validarNombre(valor) {
+  return (
+    obligatorio(valor, "El nombre completo es obligatorio") ||
+    longitudMinima(valor, 3, "El nombre debe tener al menos 3 caracteres") ||
+    longitudMaxima(valor, 60, "El nombre no puede superar 60 caracteres") ||
+    soloLetras(valor, "El nombre solo puede contener letras y espacios")
+  );
+}
+
+export function validarTelefono(valor) {
+  return (
+    obligatorio(valor, "El teléfono de contacto es obligatorio") ||
+    telefonoChileno(valor, "Ingresa un celular válido de 9 dígitos (ej: 912345678)")
+  );
+}
+
+export function validarZonaComuna(valor) {
+  const zonasValidas = ["chillan-centro", "chillan-viejo", "san-ignacio", "pinto"];
+
+  const errorObligatorio = obligatorio(valor, "Debes seleccionar una comuna o sector");
+  if (errorObligatorio) return errorObligatorio;
+
+  return zonasValidas.includes(valor)
+    ? null
+    : "La comuna o sector seleccionado no es válido";
+}
+
+export function validarDireccion(valor) {
+  return (
+    obligatorio(valor, "La dirección exacta de entrega es obligatoria") ||
+    longitudMinima(valor, 5, "Indica al menos calle y numeración (mínimo 5 caracteres)") ||
+    longitudMaxima(valor, 120, "La dirección no puede superar 120 caracteres")
+  );
+}
+
+export function validarMetodoPago(valor) {
+  const pagosValidos = ["efectivo", "transferencia"];
+
+  const errorObligatorio = obligatorio(valor, "Debes seleccionar un método de pago");
+  if (errorObligatorio) return errorObligatorio;
+
+  return pagosValidos.includes(valor)
+    ? null
+    : "El método de pago no es válido";
+}
