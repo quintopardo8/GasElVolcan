@@ -114,4 +114,5 @@ form.addEventListener("submit", (e) => {
 
   form.classList.add("is-hidden");
   panelExito.classList.remove("is-hidden");
+  panelExito.focus();
 });
