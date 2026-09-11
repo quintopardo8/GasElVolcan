@@ -26,7 +26,6 @@
                         <option value="5kg">Cilindro GLP 5 kg - $6.500</option>
                         <option value="11kg">Cilindro GLP 11 kg - $12.000</option>
                         <option value="15kg">Cilindro GLP 15 kg - $16.000</option>
-                        <option value="45kg">Cilindro GLP 45 kg - $45.000</option>
                     </select>
                     <p class="error" data-error-for="cilindro"></p>
                 </div>
@@ -50,7 +49,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="nombreCliente">Nombre completo:</label>
+                    <label for="nombreCliente">Nombre completo:*</label>
                     <input type="text" id="nombreCliente" name="nombre" placeholder="Tu nombre">
                     <p class="error" data-error-for="nombre"></p>
                 </div>
@@ -74,13 +73,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="direccionEntrega">Dirección exacta:</label>
+                    <label for="direccionEntrega">Dirección exacta:*</label>
                     <textarea id="direccionEntrega" name="direccion" placeholder="Calle, número, pasaje o referencia..."></textarea>
                     <p class="error" data-error-for="direccion"></p>
                 </div>
 
                 <div class="form-group">
-                    <label for="metodoPago">Método de pago:</label>
+                    <label for="metodoPago">Método de pago:*</label>
                     <select id="metodoPago" name="metodoPago">
                         <option value="">-- Selecciona método de pago --</option>
                         <option value="efectivo">Efectivo al repartidor</option>
