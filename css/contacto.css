@@ -161,6 +161,27 @@ textarea {
     resize: vertical;
 }
 
+.error-message {
+    min-height: 20px;
+    margin-top: 5px;
+    color: #b42318;
+    font-size: 12px;
+}
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+    border-color: #b42318;
+}
+
+.success-message {
+    min-height: 24px;
+    margin-top: 14px;
+    color: #067647;
+    font-size: 13px;
+    text-align: center;
+}
+
 button[type="submit"] {
     width: 100%;
     padding: 14px;

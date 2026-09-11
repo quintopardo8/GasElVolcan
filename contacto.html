@@ -11,8 +11,8 @@
 <body>
     <div class="container">
         <header>
-            <a href="../index.html" class="logo-container">
-                <img src="ElVolcan.jpeg" alt="Logo Distribuidora de Gas" class="logo-img">
+            <a href="index.html" class="logo-container">
+                <img src="img/ElVolcan.jpeg" alt="Logo Distribuidora de Gas" class="logo-img">
             </a>
             <h1>Contacto - Distribuidora de Gas</h1>
             <p>Ponte en contacto con nosotros para pedidos, consultas o propuestas.</p>
@@ -29,26 +29,30 @@
         </section>
 
         <main>
-            <form action="#" method="POST">
+            <form id="formularioContacto" action="#" method="POST" novalidate>
                 <div class="form-group">
                     <label for="nombre">Nombre completo</label>
                     <input type="text" id="nombre" name="nombre" required placeholder="Ej. Juan Pérez">
+                    <p class="error-message" data-error-for="nombre" aria-live="polite"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="telefono">Teléfono principal</label>
                     <input type="tel" id="telefono" name="telefono" required placeholder="Ej. 987654321">
+                    <p class="error-message" data-error-for="telefono" aria-live="polite"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="telefono_alternativo">Teléfono alternativo (contacto de respaldo)</label>
                     <input type="tel" id="telefono_alternativo" name="telefono_alternativo"
                         placeholder="Ej. 912345678 (en caso de emergencia)">
+                    <p class="error-message" data-error-for="telefonoAlternativo" aria-live="polite"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Correo electrónico</label>
                     <input type="email" id="email" name="email" placeholder="ejemplo@correo.com">
+                    <p class="error-message" data-error-for="email" aria-live="polite"></p>
                 </div>
 
                 <div class="form-group">
@@ -59,24 +63,29 @@
                         <option value="proveedor">Quiero ofrecer / vender gas o servicios</option>
                         <option value="reclamo">Reclamo o soporte</option>
                     </select>
+                    <p class="error-message" data-error-for="motivo" aria-live="polite"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="direccion">Dirección (opcional o de entrega)</label>
                     <textarea id="direccion" name="direccion" rows="2"
                         placeholder="Calle, número, referencia, distrito..."></textarea>
+                    <p class="error-message" data-error-for="direccion" aria-live="polite"></p>
                 </div>
 
                 <div class="form-group">
                     <label for="mensaje">Mensaje o detalles de tu solicitud</label>
                     <textarea id="mensaje" name="mensaje" rows="3" required
                         placeholder="Escribe aquí los detalles de tu pedido, consulta o propuesta..."></textarea>
+                    <p class="error-message" data-error-for="mensaje" aria-live="polite"></p>
                 </div>
 
                 <button type="submit">Enviar Mensaje</button>
+                <p id="mensajeExito" class="success-message" role="status" aria-live="polite"></p>
             </form>
         </main>
     </div>
+    <script type="module" src="js/contacto.js"></script>
 </body>
 
 </html>
