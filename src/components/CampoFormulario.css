@@ -1,0 +1,61 @@
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: var(--text-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--focus-color);
+    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.05);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group [aria-invalid="true"] {
+    border-color: var(--error-color);
+}
+
+.form-group .error-message {
+    min-height: 20px;
+    margin-top: 5px;
+    color: var(--error-color);
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    /* 16px evita que iOS haga zoom automático al enfocar un campo. */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px;
+    }
+}
