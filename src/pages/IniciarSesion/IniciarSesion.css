@@ -1,0 +1,131 @@
+html:has(.pagina-sesion),
+body:has(.pagina-sesion) {
+  margin: 0;
+  padding: 0;
+  display: block;
+  background: gainsboro;
+}
+ 
+#root:has(.pagina-sesion) {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pagina-sesion {
+  background-color: gainsboro;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+ 
+.pagina-sesion .cuadroBlanco {
+  font-family: 'Montserrat', sans-serif;
+  width: 400px;
+  max-width: 100%;
+  min-height: 600px;
+  background-color: white;
+  border: 2px solid white;
+  border-radius: 24px;
+ 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 0;
+}
+ 
+
+.pagina-sesion .logo {
+  width: 160px;
+  height: auto;
+  margin-top: 0;
+}
+ 
+.pagina-sesion input {
+  border: 1px solid;
+  padding: 9px 14px 5px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #F0F5FF;
+}
+ 
+.pagina-sesion .error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  min-height: 16px;
+  display: block;
+}
+ 
+.pagina-sesion .selector-sesion {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0px, 1fr));
+  gap: 4px;
+  padding: 4px;
+  background: rgb(230, 225, 217);
+  border-radius: 12px;
+}
+ 
+.pagina-sesion button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  min-width: 200px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 12px;
+  background-color: lightblue;
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.pagina-sesion button:hover {
+  background-color: rgb(134, 204, 228);
+}
+ 
+.pagina-sesion .texto-gris { color: gray; }
+.pagina-sesion .texto-gris-oscuro { color: dimgrey; }
+.pagina-sesion .enlace-azul { color: #4589FF; }
+.pagina-sesion .enlace-oscuro { color: #0b2d68; }
+ 
+
+.pagina-sesion .selector-sesion {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0px, 1fr));
+  gap: 4px;
+  padding: 4px;
+  margin: 12px 24px;
+  background: rgb(230, 225, 217);
+  border-radius: 12px;
+}
+
+.pagina-sesion .selector-sesion a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 9px;
+  background: transparent;
+  color: rgb(29, 26, 23);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pagina-sesion .selector-sesion a.active {
+  background: rgb(255, 255, 255);
+  font-weight: 700;
+  box-shadow: rgba(29, 26, 23, 0.15) 0px 1px 3px;
+}
+
