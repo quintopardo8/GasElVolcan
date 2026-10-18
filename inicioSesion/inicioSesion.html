@@ -10,19 +10,22 @@
 <body>
 
     <section class="cuadroBlanco">
-    <form id="formularioInicioSesion">
+    <form id="formularioInicioSesion" novalidate>
 
     <img class="logo" src="images/LogoElVolcan.png" alt="LogoElVolcan">
 
         <h1>Inicio sesion</h1>
         <h3 style="color: gray;">Ingresa con tu correo y contraseña</h3>
 
-        <h3>Correo</h3>
-        <input id="inputCorreo" type="email" required> 
+        <label for="Correo"> Correo*</label>
+        <br><br>
+        <input id="inputCorreo" type="email" name="correoUsuario"> 
+         <p class="error" data-error-for="correo"></p>
 
-        <h3>contraseña</h3>
-        <input id="inputContrasena" type="password" required>
-        
+        <label for="Contrasena"> Contraseña*</label>
+        <br><br>
+        <input id="inputContrasena" type="password" name="contrasenaUsuario">
+        <p class="error" data-error-for="contrasena"></p>
         <br><br>
         <a style="color: #4589FF;" href="recuperarContrasena.html">¿Olvidaste tu contraseña?, 
             Recuperemosla aquí</a>
@@ -35,15 +38,13 @@
         <h5 style="color:dimgrey;">¿No tienes una cuenta?</h5>
 
         
-        <button type="submit">
-            Registrarse
-        </button>
+        <a style="color: #0b2d68;" href="registrate"> Registrate aquí</a>
 
     </form>
     </section>
 
 
-    <script src="js/inicioSesion.js"></script>
+    <script type="module" src="js/inicioSesion.js"></script>
 
 </body>
 </html>

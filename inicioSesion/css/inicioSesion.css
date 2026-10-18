@@ -58,3 +58,11 @@ input{
     
 }
 
+.error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 16px;
+    display: block;
+}
+
