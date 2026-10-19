@@ -44,26 +44,17 @@ export default function IniciarSesion() {
     <TarjetaSesion onSubmit={handleSubmit}>
       <SelectorSesion />
 
+        <br />
       <h3 className="texto-gris">Ingresa con tu correo y contraseña</h3>
+      <br />
 
-      <CampoSesion
-        id="inputCorreo"
-        etiqueta="Correo*"
-        type="email"
-        name="correoUsuario"
-        value={correo}
-        onChange={handleCorreo}
-        error={errores.correo}
+      <CampoSesion id="inputCorreo" etiqueta="Correo*" type="email"
+        name="correoUsuario" value={correo} onChange={handleCorreo} error={errores.correo} placeholder="ejemplo@gmail.com"
       />
 
       <CampoSesion
-        id="inputContrasena"
-        etiqueta="Contraseña*"
-        type="password"
-        name="contrasenaUsuario"
-        value={contrasena}
-        onChange={handleContrasena}
-        error={errores.contrasena}
+        id="inputContrasena" etiqueta="Contraseña*" type="password"
+        name="contrasenaUsuario" value={contrasena} onChange={handleContrasena} error={errores.contrasena} placeholder="Ingresa tu contraseña"
       />
       <br /><br />
 
@@ -73,12 +64,7 @@ export default function IniciarSesion() {
 
       <br /><br />
       <button type="submit">Iniciar sesion</button>
-
-      <h5 className="texto-gris-oscuro">¿No tienes una cuenta?</h5>
-
-      <Link className="enlace-oscuro" to="/registro">
-        Registrate aquí
-      </Link>
+        <br /><br />
     </TarjetaSesion>
   );
 }

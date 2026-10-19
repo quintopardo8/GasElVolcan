@@ -1,6 +1,3 @@
-
-// de iniciar sesion y recuperar contraseña
-
 export default function CampoSesion({
   id,
   etiqueta,
@@ -9,19 +6,20 @@ export default function CampoSesion({
   value,
   onChange,
   error,
+  placeholder,
 }) {
   return (
-    <>
+    <div className="campo">
       <label htmlFor={id}>{etiqueta}</label>
-      <br /><br />
       <input
         id={id}
         type={type}
         name={name}
         value={value}
         onChange={onChange}
+        placeholder={placeholder}
       />
       <p className="error">{error}</p>
-    </>
+    </div>
   );
 }

@@ -108,13 +108,8 @@ export default function Registrarse() {
       />
 
       <br />
-      <button type="submit">Crear cuenta</button>
-
-      <h5 className="texto-gris-oscuro">¿Ya tienes una cuenta?</h5>
-
-      <Link className="enlace-oscuro" to="/iniciar-sesion">
-        Inicia sesión aquí
-      </Link>
+      <button type="submit" >Crear cuenta</button>
+        <br /><br />
     </TarjetaSesion>
   );
 }
