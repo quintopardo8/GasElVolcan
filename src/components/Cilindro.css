@@ -1,0 +1,41 @@
+/* Colores sobreescribibles con --cilindro-cuerpo y --cilindro-trazo desde el contenedor. */
+.cilindro {
+    display: block;
+    flex: none;
+}
+
+.cilindro-sombra {
+    fill: var(--cilindro-trazo, #002b49);
+    opacity: 0.12;
+}
+
+.cilindro-asa {
+    fill: none;
+    stroke: var(--cilindro-trazo, #002b49);
+    stroke-width: 5;
+}
+
+.cilindro-valvula {
+    fill: var(--cilindro-trazo, #002b49);
+}
+
+.cilindro-cuerpo {
+    fill: var(--cilindro-cuerpo, #1d72b8);
+}
+
+.cilindro-brillo {
+    fill: #ffffff;
+    opacity: 0.22;
+}
+
+.cilindro-banda {
+    fill: #000000;
+    opacity: 0.2;
+}
+
+.cilindro-texto {
+    fill: #ffffff;
+    font-family: 'Archivo', 'Arial Narrow', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+}
