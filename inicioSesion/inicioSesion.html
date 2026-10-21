@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuidora Gas el volcan</title>
+    <link rel="stylesheet" href="css/inicioSesion.css">
+</head>
+
+<body>
+
+    <section class="cuadroBlanco">
+    <form id="formularioInicioSesion" novalidate>
+
+    <img class="logo" src="images/LogoElVolcan.png" alt="LogoElVolcan">
+
+        <h1>Inicio sesion</h1>
+        <h3 style="color: gray;">Ingresa con tu correo y contraseña</h3>
+
+        <label for="Correo"> Correo*</label>
+        <br><br>
+        <input id="inputCorreo" type="email" name="correoUsuario"> 
+         <p class="error" data-error-for="correo"></p>
+
+        <label for="Contrasena"> Contraseña*</label>
+        <br><br>
+        <input id="inputContrasena" type="password" name="contrasenaUsuario">
+        <p class="error" data-error-for="contrasena"></p>
+        <br><br>
+        <a style="color: #4589FF;" href="recuperarContrasena.html">¿Olvidaste tu contraseña?, 
+            Recuperemosla aquí</a>
+
+        <br><br>
+        <button type="submit">
+            Iniciar sesion
+        </button>
+
+        <h5 style="color:dimgrey;">¿No tienes una cuenta?</h5>
+
+        
+        <a style="color: #0b2d68;" href="registrate"> Registrate aquí</a>
+
+    </form>
+    </section>
+
+
+    <script type="module" src="js/inicioSesion.js"></script>
+
+</body>
+</html>
