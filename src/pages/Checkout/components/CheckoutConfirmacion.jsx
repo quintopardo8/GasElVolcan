@@ -1,19 +1,19 @@
 // src/pages/Checkout/components/CheckoutConfirmacion.jsx
-import React, { useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
   const navigate = useNavigate();
 
   // Generamos un número de pedido y hora estables para la sesión
-  const codigoPedido = useMemo(() => {
+  const [codigoPedido] = useState(() => {
     return `EV-${Math.floor(10000 + Math.random() * 90000)}`;
-  }, []);
+  });
 
-  const horaActual = useMemo(() => {
+  const [horaActual] = useState(() => {
     const ahora = new Date();
     return ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }, []);
+  });
 
   // Extraemos datos del pedido o usamos valores de respaldo
   const dir = pedido.direccion || {};

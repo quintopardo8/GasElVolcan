@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { iniciarSesion, primerNombre } from "../../utils/sesion.js";
 import {
   validarNombre,
   validarCorreo,
@@ -21,6 +22,7 @@ const VACIO = {
 };
 
 export default function Registrarse() {
+  const navigate = useNavigate();
   const [datos, setDatos] = useState(VACIO);
   const [errores, setErrores] = useState(VACIO);
 
@@ -46,9 +48,11 @@ export default function Registrarse() {
 
     const hayErrores = Object.values(nuevosErrores).some(Boolean);
     if (!hayErrores) {
-      console.log("Registro válido:", datos.nombre, datos.correo, datos.telefono);
-      // Aquí irá el registro real (llamada al backend)
+      // Aquí irá el registro real (llamada al backend). Mientras tanto se guarda
+      // una sesión simulada y se entra al inicio.
+      iniciarSesion(primerNombre(datos.nombre));
       setDatos(VACIO);
+      navigate("/", { replace: true });
     }
   };
 

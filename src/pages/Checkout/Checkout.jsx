@@ -1,5 +1,5 @@
 // src/pages/Checkout/Checkout.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './Checkout.css';
 import CheckoutDireccion from './components/CheckoutDireccion';
 import CheckoutPago from './components/CheckoutPago';

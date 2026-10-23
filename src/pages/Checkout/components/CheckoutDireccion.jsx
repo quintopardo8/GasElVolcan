@@ -1,5 +1,5 @@
 // src/pages/Checkout/components/CheckoutDireccion.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   validarCalleNumero,
   validarComuna,

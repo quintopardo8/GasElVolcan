@@ -1,5 +1,5 @@
 const PASOS = [
-  { titulo: 'Elige tus cilindros', detalle: '5, 11 o 15 kg, los que necesites.' },
+  { titulo: 'Elige tus cilindros', detalle: '5, 11, 15 o 45 kg, además de reguladores y accesorios.' },
   { titulo: 'Indica la dirección', detalle: 'Con referencias, para que el repartidor llegue sin llamarte.' },
   { titulo: 'Paga como prefieras', detalle: 'Tarjeta, transferencia o efectivo al recibir.' },
   { titulo: 'Sigue tu pedido', detalle: 'Mira en el mapa cuándo va en camino tu repartidor.' },

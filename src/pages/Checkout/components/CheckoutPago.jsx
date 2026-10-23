@@ -1,5 +1,5 @@
 // src/pages/Checkout/components/CheckoutPago.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   validarNombreTitular,
   validarNumeroTarjeta,

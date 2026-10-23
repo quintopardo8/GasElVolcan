@@ -2,8 +2,11 @@
 import { Link, NavLink } from 'react-router-dom';
 import './Navbar.css';
 import logoVolcan from '../assets/ElVolcan.png';
+import { cerrarSesion, obtenerSesion } from '../utils/sesion.js';
 
 export default function Navbar() {
+  const sesion = obtenerSesion();
+
   return (
     <header className="header-volcan">
       <div className="header-volcan-contenido">
@@ -33,17 +36,18 @@ export default function Navbar() {
           </Link>
 
           <span className="usuario-texto">
-            Hola, <strong className="usuario-nombre">Asd</strong>
+            Hola, <strong className="usuario-nombre">{sesion?.nombre}</strong>
           </span>
 
-          <button
-            type="button"
+          <Link
+            to="/iniciar-sesion"
+            onClick={cerrarSesion}
             className="icon-interactivo"
             title="Cerrar sesión"
             aria-label="Cerrar sesión"
           >
             <span aria-hidden="true">🚪</span>
-          </button>
+          </Link>
         </div>
       </div>
     </header>

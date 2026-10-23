@@ -18,13 +18,7 @@ describe('Contacto - textos', () => {
     renderContacto()
     expect(screen.getByRole('heading', { level: 1, name: 'Contacto - Distribuidora de Gas' })).toBeInTheDocument()
     expect(screen.getByText('Ponte en contacto con nosotros para pedidos, consultas o propuestas.')).toBeInTheDocument()
-    expect(document.title).toBe('Contacto - Venta de Gas')
-  })
-
-  it('muestra el logo con enlace al inicio', () => {
-    renderContacto()
-    const logo = screen.getByRole('img', { name: 'Logo Distribuidora de Gas' })
-    expect(logo.closest('a')).toHaveAttribute('href', '/')
+    expect(document.title).toBe('Contacto | Gas El Volcán')
   })
 
   it('muestra los canales de atención', () => {
@@ -32,9 +26,9 @@ describe('Contacto - textos', () => {
     const info = screen.getByRole('heading', { name: 'Nuestros Números y Canales de Atención' }).closest('section')
     const items = within(info).getAllByRole('listitem')
     expect(items).toHaveLength(4)
-    expect(items[0]).toHaveTextContent('Teléfono Principal: +51 912 345 678 (Pedidos y Consultas)')
-    expect(items[1]).toHaveTextContent('Línea de Respaldo: +51 998 877 665 (Emergencias / Si la principal no conecta)')
-    expect(items[2]).toHaveTextContent('WhatsApp Directo: +51 900 111 222')
+    expect(items[0]).toHaveTextContent('Teléfono Principal: +56 9 1234 5678 (Pedidos y Consultas)')
+    expect(items[1]).toHaveTextContent('Línea de Respaldo: +56 9 9887 7665 (Emergencias / Si la principal no conecta)')
+    expect(items[2]).toHaveTextContent('WhatsApp Directo: +56 9 0011 1222')
     expect(items[3]).toHaveTextContent('Horario: Lunes a Sábado de 7:00 am a 8:00 pm')
   })
 

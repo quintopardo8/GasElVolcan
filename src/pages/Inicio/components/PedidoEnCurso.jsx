@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
-import { formatearDinero } from '../../../data/productos.js'
+import { formatearDinero } from '../../../data/catalogo.js'
 import { ESTADOS_PEDIDO } from '../../../utils/pedidoEnCurso.js'
 
 export default function PedidoEnCurso({ pedido }) {
-  const resumen = pedido.lineas.map((l) => `${l.cantidad} × ${l.corto}`).join(', ')
+  const resumen = pedido.lineas.map((l) => `${l.cantidad} × ${l.nombre}`).join(', ')
   const actual = Math.max(0, ESTADOS_PEDIDO.findIndex((e) => e.id === pedido.estado))
   const entregado = pedido.estado === 'entregado'
 

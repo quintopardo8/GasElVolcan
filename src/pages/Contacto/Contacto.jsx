@@ -1,18 +1,17 @@
 import { useEffect } from 'react'
-import Logo from '../../components/Logo.jsx'
 import InfoContacto from './components/InfoContacto.jsx'
 import FormularioContacto from './components/FormularioContacto.jsx'
 import './Contacto.css'
 
 export default function Contacto() {
   useEffect(() => {
-    document.title = 'Contacto - Venta de Gas'
+    document.title = 'Contacto | Gas El Volcán'
   }, [])
 
   return (
     <div className="container contacto">
+      {/* El logo y el enlace al inicio los da el Navbar global (App.jsx). */}
       <header>
-        <Logo />
         <h1>Contacto - Distribuidora de Gas</h1>
         <p>Ponte en contacto con nosotros para pedidos, consultas o propuestas.</p>
       </header>
