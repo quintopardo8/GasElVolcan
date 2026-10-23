@@ -1,28 +1,17 @@
 // src/pages/Checkout/components/CheckoutConfirmacion.jsx
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatearDinero } from '../../../data/catalogo.js';
+import { ESTADOS_PEDIDO } from '../../../utils/pedidoEnCurso.js';
 
+// pedido: { id, hora, items, total, direccion, pago } (lo arma Checkout al confirmar).
 export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
   const navigate = useNavigate();
-
-  // Generamos un número de pedido y hora estables para la sesión
-  const [codigoPedido] = useState(() => {
-    return `EV-${Math.floor(10000 + Math.random() * 90000)}`;
-  });
-
-  const [horaActual] = useState(() => {
-    const ahora = new Date();
-    return ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  });
 
   // Extraemos datos del pedido o usamos valores de respaldo
   const dir = pedido.direccion || {};
   const pago = pedido.pago || {};
-
-  const formatearDinero = (monto) =>
-    '$' + String(Math.round(monto)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-  const total = 31900;
+  const items = pedido.items || [];
+  const total = pedido.total || 0;
 
   const etiquetasMetodo = {
     tarjeta: { nombre: 'Tarjeta', badge: 'Webpay' },
@@ -41,10 +30,10 @@ export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
         </div>
         <h1 className="display-6 fw-bold mb-2">¡Pedido confirmado!</h1>
         <p className="fs-6 mb-3 text-white-50">
-          Pedido N° <strong className="text-white">{codigoPedido}</strong> · recibido hoy a las {horaActual}
+          Pedido N° <strong className="text-white">{pedido.id}</strong> · recibido hoy a las {pedido.hora}
         </p>
         <p className="small mb-0 text-white-50" style={{ maxWidth: '460px', lineHeight: '1.5' }}>
-          Te avisaremos cuando un repartidor tome tu pedido y vaya en camino. Puedes seguirlo desde el inicio.
+          Te avisaremos cuando un repartidor tome tu pedido y vaya en camino. Puedes seguirlo desde el inicio o en Rastrea tu pedido.
         </p>
       </div>
 
@@ -54,33 +43,20 @@ export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
           Estado del pedido
         </h2>
 
-        <div className="row g-3">
-          <div className="col-6 col-md-3">
-            <div className="step-bar step-bar-active mb-2"></div>
-            <div className="small fw-bold text-dark d-flex align-items-center gap-1">
-              <span>✓</span> Recibido
-            </div>
-            <div className="text-muted" style={{ fontSize: '12px' }}>Hoy, {horaActual}</div>
-          </div>
-
-          <div className="col-6 col-md-3">
-            <div className="step-bar step-bar-current mb-2"></div>
-            <div className="small fw-semibold text-dark">Asignado a repartidor</div>
-            <div className="text-muted" style={{ fontSize: '12px' }}>La operadora lo asigna en breve</div>
-          </div>
-
-          <div className="col-6 col-md-3">
-            <div className="step-bar step-bar-pending mb-2"></div>
-            <div className="small text-secondary">En camino</div>
-            <div className="text-muted" style={{ fontSize: '12px' }}>Lo verás moverse en el mapa</div>
-          </div>
-
-          <div className="col-6 col-md-3">
-            <div className="step-bar step-bar-pending mb-2"></div>
-            <div className="small text-secondary">Entregado</div>
-            <div className="text-muted" style={{ fontSize: '12px' }}>El pago queda registrado</div>
-          </div>
-        </div>
+        {/* Mismos pasos que muestran el inicio y la página de rastreo. */}
+        <ol className="row g-3 list-unstyled mb-0" aria-label="Estado del pedido">
+          {ESTADOS_PEDIDO.map((estado, i) => (
+            <li key={estado.id} className="col-6 col-md-3">
+              <div className={`step-bar mb-2 ${i === 0 ? 'step-bar-active' : i === 1 ? 'step-bar-current' : 'step-bar-pending'}`}></div>
+              <div className={`small d-flex align-items-center gap-1 ${i === 0 ? 'fw-bold text-dark' : i === 1 ? 'fw-semibold text-dark' : 'text-secondary'}`}>
+                {i === 0 && <span aria-hidden="true">✓</span>} {estado.nombre}
+              </div>
+              <div className="text-muted" style={{ fontSize: '12px' }}>
+                {i === 0 ? `Hoy, ${pedido.hora}` : estado.nota}
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
 
       {/* 3. Filas Entrega y Pago */}
@@ -125,12 +101,16 @@ export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
         <span className="text-uppercase text-muted fw-bold d-block mb-3" style={{ fontSize: '11px', letterSpacing: '0.8px' }}>
           Detalle
         </span>
-        <div className="d-flex justify-content-between align-items-center pb-3 border-bottom border-light-subtle">
-          <span className="text-dark">
-            <strong className="me-1">1×</strong> Cilindro 15 kg
-          </span>
-          <span className="fw-semibold text-dark">{formatearDinero(total)}</span>
-        </div>
+        <ul className="list-unstyled mb-0 pb-2 border-bottom border-light-subtle">
+          {items.map((item) => (
+            <li key={item.id} className="d-flex justify-content-between align-items-center pb-2">
+              <span className="text-dark">
+                <strong className="me-1">{item.quantity}×</strong> {item.name}
+              </span>
+              <span className="fw-semibold text-dark">{formatearDinero(item.price * item.quantity)}</span>
+            </li>
+          ))}
+        </ul>
 
         <div className="d-flex justify-content-between align-items-baseline pt-3">
           <span className="fw-bold fs-5 text-dark">Total</span>
@@ -151,10 +131,17 @@ export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
         </button>
         <button
           type="button"
-          className="btn btn-volcan"
+          className="btn btn-outline-volcan"
           onClick={onNuevoPedido}
         >
           Hacer otro pedido
+        </button>
+        <button
+          type="button"
+          className="btn btn-volcan"
+          onClick={() => navigate('/rastreo')}
+        >
+          Rastrear pedido
         </button>
       </div>
     </div>

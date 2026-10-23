@@ -1,9 +1,7 @@
-// src/pages/Checkout/components/ResumenPedidoAside.jsx
+// src/components/ResumenPedidoAside.jsx
+import { formatearDinero } from '../data/catalogo.js';
 
 export default function ResumenPedidoAside({ cart = [], onEditar }) {
-  const formatearDinero = (monto) =>
-    '$' + String(Math.round(monto)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (

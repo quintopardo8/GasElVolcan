@@ -1,22 +1,36 @@
 // src/pages/Checkout/Checkout.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Checkout.css';
 import CheckoutDireccion from './components/CheckoutDireccion';
 import CheckoutPago from './components/CheckoutPago';
 import CheckoutConfirmacion from './components/CheckoutConfirmacion';
 import ResumenPedidoAside from "../../components/ResumenPedidoAside.jsx";
+import { useCarrito } from '../../context/CarritoContext.js';
+import { guardarPedidoEnCurso } from '../../utils/pedidoEnCurso.js';
 
-const CARRITO_INICIAL = [
-  { id: 'c15', name: 'Cilindro 15 kg', price: 31900, quantity: 1 }
-];
+function generarCodigoPedido() {
+  return `EV-${Math.floor(10000 + Math.random() * 90000)}`;
+}
+
+function horaActual() {
+  return new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+}
 
 export default function Checkout() {
+  const navigate = useNavigate();
+  const { items, total, vaciar } = useCarrito();
   const [paso, setPaso] = useState(2);
-  const [cart] = useState(CARRITO_INICIAL);
   const [datosPedido, setDatosPedido] = useState({
     direccion: null,
     pago: null
   });
+  // Copia del pedido al confirmarlo: el carrito se vacía, pero la confirmación lo sigue mostrando.
+  const [pedidoConfirmado, setPedidoConfirmado] = useState(null);
+
+  useEffect(() => {
+    document.title = 'Checkout | Gas El Volcán';
+  }, []);
 
   const manejarPasoDireccion = (direccion) => {
     setDatosPedido((prev) => ({ ...prev, direccion }));
@@ -24,14 +38,26 @@ export default function Checkout() {
   };
 
   const manejarPasoPago = (pago) => {
+    const { street, unit, comuna, slot } = datosPedido.direccion;
+    const pedido = {
+      id: generarCodigoPedido(),
+      hora: horaActual(),
+      estado: 'confirmado',
+      lineas: items.map((item) => ({ id: item.id, cantidad: item.quantity })),
+      pago: pago.metodo,
+      direccion: { street, unit, comuna, slot },
+    };
+
+    // El inicio y la página de rastreo leen este pedido.
+    guardarPedidoEnCurso(pedido);
+    setPedidoConfirmado({ ...pedido, items, total });
     setDatosPedido((prev) => ({ ...prev, pago }));
+    vaciar();
     setPaso(4);
   };
 
-  const reiniciarFlujo = () => {
-    setDatosPedido({ direccion: null, pago: null });
-    setPaso(2);
-  };
+  const irAlCatalogo = () => navigate('/catalogo');
+  const carritoVacio = items.length === 0 && paso !== 4;
 
   return (
     <div className="checkout-wrapper py-4 pb-5">
@@ -72,10 +98,23 @@ export default function Checkout() {
         </div>
 
         {/* Vistas dinámicas según el paso */}
-        {paso === 4 ? (
+        {carritoVacio ? (
+          <div className="checkout-card p-4 p-md-5 mx-auto text-center" style={{ maxWidth: '560px' }}>
+            <div className="fs-1 mb-2" aria-hidden="true">🛒</div>
+            <h1 className="h3 fw-bold mb-2" style={{ color: 'var(--volcan-navy)' }}>
+              Tu carrito está vacío
+            </h1>
+            <p className="small mb-4" style={{ color: 'var(--volcan-muted)' }}>
+              Agrega cilindros o accesorios desde el catálogo para continuar con tu pedido.
+            </p>
+            <Link to="/catalogo" className="btn btn-volcan">
+              Ir al catálogo
+            </Link>
+          </div>
+        ) : paso === 4 ? (
           <CheckoutConfirmacion
-            pedido={datosPedido}
-            onNuevoPedido={reiniciarFlujo}
+            pedido={{ ...datosPedido, ...pedidoConfirmado }}
+            onNuevoPedido={irAlCatalogo}
           />
         ) : (
           <div className="row g-4 align-items-start justify-content-center">
@@ -84,7 +123,7 @@ export default function Checkout() {
                 <CheckoutDireccion
                   datosPrevios={datosPedido.direccion || {}}
                   onContinuar={manejarPasoDireccion}
-                  onVolver={() => window.history.back()}
+                  onVolver={irAlCatalogo}
                 />
               )}
 
@@ -97,9 +136,10 @@ export default function Checkout() {
             </div>
 
             <div className="col-12 col-lg-4">
+              {/* Los productos se editan en el catálogo, que comparte el mismo carrito. */}
               <ResumenPedidoAside
-                cart={cart}
-                onEditar={() => setPaso(2)}
+                cart={items}
+                onEditar={irAlCatalogo}
               />
             </div>
           </div>

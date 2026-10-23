@@ -136,6 +136,18 @@
     align-items: start;
 }
 
+.rastreo .order-label {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+}
+
+.rastreo .order-label strong {
+    color: var(--ink);
+}
+
 .rastreo h2 {
     margin: 0;
     color: var(--navy);
@@ -289,7 +301,8 @@
     position: absolute;
     top: 14px;
     left: 12%;
-    width: 51%;
+    /* La línea gris mide 76% y tiene 3 tramos; --paso lo pone LineaTiempo.jsx. */
+    width: calc(76% * var(--paso, 0) / 3);
     height: 3px;
     background: var(--green);
     content: "";
@@ -394,6 +407,40 @@
     font-size: 12px;
 }
 
+.rastreo .delivery-details ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Sin pedido guardado: invita a pedir desde el catálogo. */
+.rastreo .tracking-empty {
+    padding: 40px 30px;
+    text-align: center;
+}
+
+.rastreo .tracking-empty p {
+    margin: 8px 0 20px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.rastreo .tracking-empty-link {
+    display: inline-block;
+    padding: 11px 22px;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--blue);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .2s;
+}
+
+.rastreo .tracking-empty-link:hover {
+    background: #0b538b;
+}
+
 .rastreo footer {
     padding: 0 20px 28px;
     color: #84919b;
@@ -442,7 +489,7 @@
     }
 
     .rastreo .timeline::after {
-        height: 57%;
+        height: calc((100% - 30px) * var(--paso, 0) / 3);
     }
 
     .rastreo .timeline li {
