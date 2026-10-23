@@ -3,7 +3,7 @@
 .contacto {
     width: calc(100% - 40px);
     max-width: 600px;
-    /* Se centra solo: el body global ya no lo centra (index.css compartido). */
+    /* Se centra solo: el body global (index.css compartido) ya no lo centra. */
     margin: 40px auto;
     background: var(--card-bg);
     border: 1px solid rgba(0, 0, 0, 0.05);
