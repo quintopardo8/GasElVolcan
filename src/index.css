@@ -1,0 +1,33 @@
+:root {
+  --volcan-navy: #002b49;         
+  --volcan-blue: #1d72b8;         
+  --volcan-blue-hover: #15578d;   
+  --volcan-cyan-subtle: #e0f2fe;  
+  --volcan-bg: #f8fafc;           
+  --volcan-border: #cbd5e1;       
+  --volcan-muted: #64748b;        
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f6f5f3;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1c110c;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
