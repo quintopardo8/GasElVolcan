@@ -1,0 +1,293 @@
+/* Todo con prefijo .inicio: en React el CSS importado es global,
+   así no afecta a las demás vistas. Medidas tomadas del prototipo (prototipo/Main.dc.html). */
+.inicio {
+    --acento: var(--volcan-blue);
+    --acento-hover: var(--volcan-blue-hover);
+    --acento-tenue: #1d72b855;
+    --tinta: var(--volcan-navy);
+    --texto: #1d1a17;
+    --suave: #5e574f;
+    --apagado: #6b635a;
+    --borde: #e2ddd5;
+    --borde-fuerte: #cfc8be;
+    --fondo-hover: #ece8e1;
+
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px clamp(16px, 3vw, 32px) 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--texto);
+    font-family: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    animation: inicio-entrada 0.3s ease-out;
+}
+
+.inicio h1,
+.inicio h2,
+.inicio .inicio-pasos-numero {
+    font-family: 'Archivo', 'Arial Narrow', sans-serif;
+    color: var(--tinta);
+}
+
+.inicio .tarjeta {
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    border-radius: 22px;
+}
+
+.inicio .eyebrow {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--acento);
+}
+
+.inicio .texto-suave {
+    color: var(--suave);
+}
+
+/* Botones */
+.inicio .boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.inicio .boton:focus-visible {
+    outline: 2px solid var(--tinta);
+    outline-offset: 2px;
+}
+
+.inicio .boton-primario {
+    min-height: 54px;
+    padding: 0 26px;
+    background: var(--acento);
+    color: #ffffff;
+    font-size: 17px;
+    transition: background-color 0.15s, transform 0.1s;
+}
+
+.inicio .boton-primario:hover {
+    background: var(--acento-hover);
+}
+
+.inicio .boton-primario:active {
+    transform: translateY(1px);
+}
+
+.inicio .boton-secundario {
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 18px;
+    border: 1.5px solid var(--borde-fuerte);
+    background: transparent;
+    color: var(--tinta);
+    font-weight: 600;
+    transition: background-color 0.15s;
+}
+
+.inicio .boton-secundario:hover {
+    background: var(--fondo-hover);
+}
+
+/* Hero */
+.inicio .inicio-hero {
+    padding: clamp(24px, 4vw, 52px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+}
+
+.inicio .inicio-hero-texto {
+    flex: 1 1 420px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.inicio .inicio-hero h1 {
+    font-stretch: 118%;
+    font-weight: 850;
+    font-size: clamp(36px, 4.4vw, 60px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+}
+
+.inicio .inicio-hero-bajada {
+    max-width: 480px;
+    font-size: 18px;
+    color: var(--suave);
+    text-wrap: pretty;
+}
+
+.inicio .inicio-hero-cilindros {
+    flex: 0 1 auto;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 8px 8px 0;
+}
+
+/* Pedido en curso */
+.inicio .inicio-pedido {
+    padding: clamp(20px, 3vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.inicio .inicio-pedido-cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.inicio .inicio-pedido-cabecera > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.inicio .inicio-pedido h2 {
+    font-stretch: 115%;
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -0.01em;
+}
+
+.inicio .inicio-pedido-pasos {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr));
+    gap: 14px;
+}
+
+.inicio .inicio-pedido-pasos li {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inicio .paso-barra {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--borde);
+}
+
+.inicio .hecho .paso-barra {
+    background: var(--acento);
+}
+
+.inicio .en-curso .paso-barra {
+    background: var(--acento-tenue);
+}
+
+.inicio .paso-nombre {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--apagado);
+}
+
+.inicio .hecho .paso-nombre,
+.inicio .en-curso .paso-nombre {
+    color: var(--texto);
+}
+
+.inicio .paso-nota {
+    font-size: 14px;
+    color: var(--suave);
+}
+
+/* Así funciona */
+.inicio .inicio-pasos {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.inicio .inicio-pasos h2 {
+    font-stretch: 115%;
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.01em;
+}
+
+.inicio .inicio-pasos ol {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+    gap: 14px;
+}
+
+.inicio .inicio-pasos li {
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.inicio .inicio-pasos-numero {
+    font-stretch: 115%;
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--acento);
+}
+
+.inicio .inicio-pasos strong {
+    font-size: 17px;
+}
+
+.inicio .inicio-pasos li > span:last-child {
+    color: var(--suave);
+    font-size: 15px;
+}
+
+@keyframes inicio-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* En pantallas chicas los cilindros se achican para no desbordar. */
+@media (max-width: 420px) {
+    .inicio .inicio-hero-cilindros .cilindro {
+        width: 76px;
+        height: 106px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .inicio,
+    .inicio * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

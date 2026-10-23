@@ -1,11 +1,23 @@
 :root {
-  --volcan-navy: #002b49;         
-  --volcan-blue: #1d72b8;         
-  --volcan-blue-hover: #15578d;   
-  --volcan-cyan-subtle: #e0f2fe;  
-  --volcan-bg: #f8fafc;           
-  --volcan-border: #cbd5e1;       
-  --volcan-muted: #64748b;        
+  --volcan-navy: #002b49;
+  --volcan-blue: #1d72b8;
+  --volcan-blue-hover: #15578d;
+  --volcan-cyan-subtle: #e0f2fe;
+  --volcan-bg: #f8fafc;
+  --volcan-border: #cbd5e1;
+  --volcan-muted: #64748b;
+
+  /* Variables de la vista Contacto y CampoFormulario */
+  --bg-color: #eef2f3;
+  --card-bg: #ffffff;
+  --text-color: #222222;
+  --text-muted: #666666;
+  --border-color: #e0e0e0;
+  --focus-color: #111111;
+  --btn-bg: #111111;
+  --btn-hover: #333333;
+  --error-color: #b42318;
+  --success-color: #067647;
 }
 
 

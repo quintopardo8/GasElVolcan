@@ -1,5 +1,4 @@
 // src/pages/Checkout/components/ResumenPedidoAside.jsx
-import React from 'react';
 
 export default function ResumenPedidoAside({ cart = [], onEditar }) {
   const formatearDinero = (monto) =>
