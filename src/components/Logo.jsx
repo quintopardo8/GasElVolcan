@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logo from '../assets/ElVolcan.jpeg'
+import logo from '../assets/ElVolcan.png'
 import './Logo.css'
 
 export default function Logo() {
