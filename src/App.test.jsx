@@ -80,7 +80,7 @@ describe('App - navegación', () => {
     ['/catalogo', 'Elige tus productos'],
     ['/contacto', 'Contacto - Distribuidora de Gas'],
     ['/rastreo', 'Rastrea tu pedido'],
-    ['/checkout', '¿Dónde entregamos?'],
+    ['/checkout', 'Tu carrito está vacío'],
   ])('%s muestra el navbar y se puede volver al inicio', async (ruta, titulo) => {
     const user = renderEn(ruta)
     expect(screen.getByRole('heading', { level: 1, name: titulo })).toBeInTheDocument()

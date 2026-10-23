@@ -3,9 +3,14 @@ import { Link, NavLink } from 'react-router-dom';
 import './Navbar.css';
 import logoVolcan from '../assets/ElVolcan.png';
 import { cerrarSesion, obtenerSesion } from '../utils/sesion.js';
+import { useCarrito } from '../context/CarritoContext.js';
 
 export default function Navbar() {
   const sesion = obtenerSesion();
+  const { totalUnidades } = useCarrito();
+  const etiquetaCarrito = totalUnidades === 0
+    ? 'Ver carrito: vacío'
+    : `Ver carrito: ${totalUnidades} ${totalUnidades === 1 ? 'producto' : 'productos'}`;
 
   return (
     <header className="header-volcan">
@@ -28,11 +33,13 @@ export default function Navbar() {
 
         {/* Lado derecho: Carrito, Usuario y Salir en tono azul */}
         <div className="header-volcan-grupo header-volcan-derecha">
-          <Link to="/checkout" className="icon-interactivo" title="Ver carrito" aria-label="Ver carrito: 1 cilindro">
+          <Link to="/checkout" className="icon-interactivo" title="Ver carrito" aria-label={etiquetaCarrito}>
             <span aria-hidden="true">🛒</span>
-            <span className="badge-carrito" aria-hidden="true">
-              1
-            </span>
+            {totalUnidades > 0 && (
+              <span className="badge-carrito" aria-hidden="true">
+                {totalUnidades}
+              </span>
+            )}
           </Link>
 
           <span className="usuario-texto">

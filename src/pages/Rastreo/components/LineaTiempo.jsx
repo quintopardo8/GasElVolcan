@@ -1,21 +1,25 @@
+import { ESTADOS_PEDIDO } from '../../../utils/pedidoEnCurso.js'
+
 const ICONOS = { complete: '✓', active: '●' }
 
-const PASOS = [
-  { titulo: 'Pedido confirmado', detalle: 'Hoy, 17:42 hrs.', estado: 'complete' },
-  { titulo: 'Pedido preparado', detalle: 'Hoy, 18:03 hrs.', estado: 'complete' },
-  { titulo: 'En camino a tu domicilio', detalle: 'Actualizado hace un momento', estado: 'active' },
-  { titulo: 'Pedido entregado', detalle: 'Próximamente', estado: '' },
-]
+export default function LineaTiempo({ pedido }) {
+  const entregado = pedido.estado === 'entregado'
+  const actual = Math.max(0, ESTADOS_PEDIDO.findIndex((e) => e.id === pedido.estado))
 
-export default function LineaTiempo() {
   return (
-    <ol className="timeline" aria-label="Estado del pedido">
-      {PASOS.map(({ titulo, detalle, estado }) => (
-        <li key={titulo} className={estado || undefined}>
-          <span className="timeline-icon">{ICONOS[estado]}</span>
-          <div><strong>{titulo}</strong><small>{detalle}</small></div>
-        </li>
-      ))}
+    // --paso mueve la barra verde hasta el paso actual (ver .timeline::after).
+    <ol className="timeline" aria-label="Estado del pedido" style={{ '--paso': actual }}>
+      {ESTADOS_PEDIDO.map((estado, i) => {
+        const clase = i < actual || entregado ? 'complete' : i === actual ? 'active' : ''
+        let detalle = clase === 'active' ? 'Actualizado hace un momento' : clase === 'complete' ? estado.nota : 'Próximamente'
+        if (i === 0 && pedido.hora) detalle = `Hoy, ${pedido.hora} hrs.`
+        return (
+          <li key={estado.id} className={clase || undefined}>
+            <span className="timeline-icon">{ICONOS[clase]}</span>
+            <div><strong>{estado.nombre}</strong><small>{detalle}</small></div>
+          </li>
+        )
+      })}
     </ol>
   )
 }

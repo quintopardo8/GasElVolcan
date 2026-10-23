@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react';
 import { CATEGORIAS, PRODUCTOS, formatearDinero } from '../../data/catalogo.js';
 import { useCarrito } from '../../context/CarritoContext.js';
-import CarritoProvider from '../../context/CarritoProvider.jsx';
 import TarjetaProducto from './components/TarjetaProducto.jsx';
 import PedidoAside from './components/PedidoAside.jsx';
 import './Catalogo.css';
 
 const TODAS = 'Todos';
 
-// El carrito vive dentro del catálogo. Si más adelante el navbar o el checkout
-// necesitan leerlo, basta con subir <CarritoProvider> a App.jsx.
+// El carrito lo entrega <CarritoProvider> desde App.jsx: lo comparten el navbar y el checkout.
 export default function Catalogo() {
-  return (
-    <CarritoProvider>
-      <ContenidoCatalogo />
-    </CarritoProvider>
-  );
-}
-
-function ContenidoCatalogo() {
   const [categoria, setCategoria] = useState(TODAS);
   const { totalUnidades, total } = useCarrito();
 

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Navbar from './components/Navbar.jsx'
+import CarritoProvider from './context/CarritoProvider.jsx'
 import Inicio from './pages/Inicio/Inicio.jsx'
 import Catalogo from './pages/Catalogo/Catalogo.jsx'
 import Contacto from './pages/Contacto/Contacto.jsx'
@@ -43,7 +44,10 @@ function Contenido() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Contenido />
+      {/* El carrito es global: lo usan el catálogo, el navbar y el checkout. */}
+      <CarritoProvider>
+        <Contenido />
+      </CarritoProvider>
     </BrowserRouter>
   )
 }
