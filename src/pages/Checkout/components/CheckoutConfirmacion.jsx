@@ -1,149 +1,227 @@
-// src/pages/Checkout/components/CheckoutConfirmacion.jsx
-import { useNavigate } from 'react-router-dom';
-import { formatearDinero } from '../../../data/catalogo.js';
-import { ESTADOS_PEDIDO } from '../../../utils/pedidoEnCurso.js';
+import { useState } from 'react';
+import {
+  validarNombreTitular,
+  validarNumeroTarjeta,
+  validarVencimiento,
+  validarCvv
+} from '../../../utils/validadoresCheckout';
 
-// pedido: { id, hora, items, total, direccion, pago } (lo arma Checkout al confirmar).
-export default function CheckoutConfirmacion({ pedido = {}, onNuevoPedido }) {
-  const navigate = useNavigate();
+export default function CheckoutPago({ onConfirmar, onVolverAtras }) {
+  const [metodo, setMetodo] = useState('tarjeta');
+  const [datosTarjeta, setDatosTarjeta] = useState({
+    titular: '',
+    numero: '',
+    vencimiento: '',
+    cvv: ''
+  });
+  const [errores, setErrores] = useState({});
 
-  // Extraemos datos del pedido o usamos valores de respaldo
-  const dir = pedido.direccion || {};
-  const pago = pedido.pago || {};
-  const items = pedido.items || [];
-  const total = pedido.total || 0;
-
-  const etiquetasMetodo = {
-    tarjeta: { nombre: 'Tarjeta', badge: 'Webpay' },
-    efectivo: { nombre: 'Efectivo', badge: 'Al recibir' },
-    transferencia: { nombre: 'Transferencia', badge: 'Pendiente comprobante' }
+  const manejarCambioTarjeta = (e) => {
+    const { name, value } = e.target;
+    setDatosTarjeta((prev) => ({ ...prev, [name]: value }));
+    if (errores[name]) {
+      setErrores((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
-  const metodoActual = etiquetasMetodo[pago.metodo] || etiquetasMetodo.efectivo;
+  const manejarEnvio = (e) => {
+    e.preventDefault();
+
+    if (metodo === 'tarjeta') {
+      const errTitular = validarNombreTitular(datosTarjeta.titular);
+      const errNumero = validarNumeroTarjeta(datosTarjeta.numero);
+      const errVenc = validarVencimiento(datosTarjeta.vencimiento);
+      const errCvv = validarCvv(datosTarjeta.cvv);
+
+      const lista = {};
+      if (errTitular) lista.titular = errTitular;
+      if (errNumero) lista.numero = errNumero;
+      if (errVenc) lista.vencimiento = errVenc;
+      if (errCvv) lista.cvv = errCvv;
+
+      if (Object.keys(lista).length > 0) {
+        setErrores(lista);
+        return;
+      }
+    }
+
+    setErrores({});
+    onConfirmar({
+      metodo,
+      ...(metodo === 'tarjeta' ? { titular: datosTarjeta.titular } : {})
+    });
+  };
 
   return (
-    <div className="mx-auto" style={{ maxWidth: '820px' }}>
-      {/* 1. Banner Hero Oscuro */}
-      <div className="confirmacion-hero p-4 p-md-5 mb-4 text-white">
-        <div className="circulo-check-hero mb-3">
-          ✓
-        </div>
-        <h1 className="display-6 fw-bold mb-2">¡Pedido confirmado!</h1>
-        <p className="fs-6 mb-3 text-white-50">
-          Pedido N° <strong className="text-white">{pedido.id}</strong> · recibido hoy a las {pedido.hora}
-        </p>
-        <p className="small mb-0 text-white-50" style={{ maxWidth: '460px', lineHeight: '1.5' }}>
-          Te avisaremos cuando un repartidor tome tu pedido y vaya en camino. Puedes seguirlo desde el inicio o en Rastrea tu pedido.
-        </p>
-      </div>
+    <div className="checkout-card p-4 p-md-5">
+      <h1 className="h3 fw-bold mb-1" style={{ color: 'var(--volcan-navy)' }}>
+        Método de pago
+      </h1>
+      <p className="small mb-4" style={{ color: 'var(--volcan-muted)' }}>
+        Selecciona cómo deseas pagar tu cilindro de gas.
+      </p>
 
-      {/* 2. Estado del Pedido */}
-      <div className="checkout-card p-4 mb-4">
-        <h2 className="h5 fw-bold mb-4" style={{ color: 'var(--volcan-navy)' }}>
-          Estado del pedido
-        </h2>
-
-        {/* Mismos pasos que muestran el inicio y la página de rastreo. */}
-        <ol className="row g-3 list-unstyled mb-0" aria-label="Estado del pedido">
-          {ESTADOS_PEDIDO.map((estado, i) => (
-            <li key={estado.id} className="col-6 col-md-3">
-              <div className={`step-bar mb-2 ${i === 0 ? 'step-bar-active' : i === 1 ? 'step-bar-current' : 'step-bar-pending'}`}></div>
-              <div className={`small d-flex align-items-center gap-1 ${i === 0 ? 'fw-bold text-dark' : i === 1 ? 'fw-semibold text-dark' : 'text-secondary'}`}>
-                {i === 0 && <span aria-hidden="true">✓</span>} {estado.nombre}
+      <form onSubmit={manejarEnvio} noValidate>
+        <div className="row g-2 mb-4">
+          <div className="col-12 col-md-4">
+            <button
+              type="button"
+              className={`w-100 p-3 text-start rounded-3 border h-100 ${
+                metodo === 'tarjeta' ? 'border-volcan bg-volcan-subtle' : 'bg-white'
+              }`}
+              onClick={() => setMetodo('tarjeta')}
+            >
+              <div className="fw-bold mb-1" style={{ color: 'var(--volcan-navy)' }}>
+                Tarjeta Débito/Crédito
               </div>
-              <div className="text-muted" style={{ fontSize: '12px' }}>
-                {i === 0 ? `Hoy, ${pedido.hora}` : estado.nota}
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
+              <small className="text-secondary d-block">Webpay / Transbank</small>
+            </button>
+          </div>
 
-      {/* 3. Filas Entrega y Pago */}
-      <div className="row g-4 mb-4">
-        {/* Entrega */}
-        <div className="col-12 col-md-6">
-          <div className="checkout-card p-4 h-100">
-            <span className="text-uppercase text-muted fw-bold" style={{ fontSize: '11px', letterSpacing: '0.8px' }}>
-              Entrega
-            </span>
-            <h3 className="h6 fw-bold mt-2 mb-1 text-dark">
-              {dir.street || 'Dirección no especificada'} {dir.unit && `(${dir.unit})`}
-            </h3>
-            <p className="text-secondary small mb-2">
-              {dir.comuna || 'Chillán'}, Región de Ñuble
-            </p>
-            <p className="text-secondary small mb-0">
-              {dir.slot === 'am' ? 'Durante la mañana' : dir.slot === 'pm' ? 'Durante la tarde' : 'Lo antes posible'} · {dir.phone || '+56 9 ________'}
-            </p>
+          <div className="col-12 col-md-4">
+            <button
+              type="button"
+              className={`w-100 p-3 text-start rounded-3 border h-100 ${
+                metodo === 'efectivo' ? 'border-volcan bg-volcan-subtle' : 'bg-white'
+              }`}
+              onClick={() => setMetodo('efectivo')}
+            >
+              <div className="fw-bold mb-1" style={{ color: 'var(--volcan-navy)' }}>
+                Efectivo contra entrega
+              </div>
+              <small className="text-secondary d-block">Pagas al chofer al recibir</small>
+            </button>
+          </div>
+
+          <div className="col-12 col-md-4">
+            <button
+              type="button"
+              className={`w-100 p-3 text-start rounded-3 border h-100 ${
+                metodo === 'transferencia' ? 'border-volcan bg-volcan-subtle' : 'bg-white'
+              }`}
+              onClick={() => setMetodo('transferencia')}
+            >
+              <div className="fw-bold mb-1" style={{ color: 'var(--volcan-navy)' }}>
+                Transferencia directa
+              </div>
+              <small className="text-secondary d-block">Envías comprobante</small>
+            </button>
           </div>
         </div>
 
-        {/* Pago */}
-        <div className="col-12 col-md-6">
-          <div className="checkout-card p-4 h-100">
-            <span className="text-uppercase text-muted fw-bold" style={{ fontSize: '11px', letterSpacing: '0.8px' }}>
-              Pago
-            </span>
-            <div className="d-flex align-items-center gap-2 mt-2 mb-2">
-              <h3 className="h6 fw-bold mb-0 text-dark">{metodoActual.nombre}</h3>
-              <span className="badge-metodo">{metodoActual.badge}</span>
+        <div style={{ minHeight: '260px' }}>
+          {metodo === 'tarjeta' && (
+            <div className="p-4 rounded-3 border bg-light-subtle">
+              <h6 className="fw-bold mb-3" style={{ color: 'var(--volcan-navy)' }}>
+                Datos de la tarjeta
+              </h6>
+              <div className="row g-3">
+                <div className="col-12">
+                  <label className="form-label">Nombre en la tarjeta *</label>
+                  <input
+                    type="text"
+                    name="titular"
+                    className={`form-control ${errores.titular ? 'is-invalid' : ''}`}
+                    placeholder="Ej.: SEBASTIAN PARDO"
+                    value={datosTarjeta.titular}
+                    onChange={manejarCambioTarjeta}
+                  />
+                  {errores.titular && <div className="invalid-feedback">{errores.titular}</div>}
+                </div>
+
+                <div className="col-12">
+                  <label className="form-label">Número de tarjeta *</label>
+                  <input
+                    type="text"
+                    name="numero"
+                    maxLength={19}
+                    className={`form-control ${errores.numero ? 'is-invalid' : ''}`}
+                    placeholder="1234 5678 9012 3456"
+                    value={datosTarjeta.numero}
+                    onChange={manejarCambioTarjeta}
+                  />
+                  {errores.numero && <div className="invalid-feedback">{errores.numero}</div>}
+                </div>
+
+                <div className="col-6">
+                  <label className="form-label">Vencimiento (MM/AA) *</label>
+                  <input
+                    type="text"
+                    name="vencimiento"
+                    maxLength={5}
+                    className={`form-control ${errores.vencimiento ? 'is-invalid' : ''}`}
+                    placeholder="08/27"
+                    value={datosTarjeta.vencimiento}
+                    onChange={manejarCambioTarjeta}
+                  />
+                  {errores.vencimiento && <div className="invalid-feedback">{errores.vencimiento}</div>}
+                </div>
+
+                <div className="col-6">
+                  <label className="form-label">CVV *</label>
+                  <input
+                    type="password"
+                    name="cvv"
+                    maxLength={4}
+                    className={`form-control ${errores.cvv ? 'is-invalid' : ''}`}
+                    placeholder="123"
+                    value={datosTarjeta.cvv}
+                    onChange={manejarCambioTarjeta}
+                  />
+                  {errores.cvv && <div className="invalid-feedback">{errores.cvv}</div>}
+                </div>
+              </div>
             </div>
-            <p className="text-secondary small mb-0">
-              {pago.metodo === 'tarjeta' ? 'Pago verificado mediante Webpay' : `Paga ${formatearDinero(total)} al repartidor`}
-            </p>
-          </div>
+          )}
+
+          {metodo === 'efectivo' && (
+            <div className="p-4 rounded-3 border bg-light-subtle">
+              <h6 className="fw-bold mb-2" style={{ color: 'var(--volcan-navy)' }}>
+                Pago en efectivo al repartidor
+              </h6>
+              <p className="text-secondary small mb-3">
+                Puedes pagar con billetes o monedas al recibir tu cilindro en tu domicilio.
+              </p>
+              <div className="alert alert-info py-2 small mb-0">
+                <strong>Vuelto disponible:</strong> El camión cuenta con sencillo para billetes de hasta $20.000.
+              </div>
+            </div>
+          )}
+
+          {metodo === 'transferencia' && (
+            <div className="p-4 rounded-3 border bg-light-subtle">
+              <h6 className="fw-bold mb-2" style={{ color: 'var(--volcan-navy)' }}>
+                Datos de transferencia bancaria
+              </h6>
+              <p className="text-secondary small mb-3">
+                Transfiere el monto total y envía el comprobante por WhatsApp para validar el despacho.
+              </p>
+              <div className="p-3 bg-white rounded border small mb-3">
+                <div><strong>Banco:</strong> BancoEstado</div>
+                <div><strong>Tipo de Cuenta:</strong> Cuenta Corriente N° 123456789</div>
+                <div><strong>RUT:</strong> 76.543.210-K</div>
+                <div><strong>Razón Social:</strong> Distribuidora Gas El Volcán SpA</div>
+              </div>
+              <div className="alert alert-info py-2 px-3 small mb-0">
+                📱 <strong>WhatsApp para comprobantes:</strong> +56 9 0011 1222
+              </div>
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* 4. Detalle del pedido */}
-      <div className="checkout-card p-4 mb-4">
-        <span className="text-uppercase text-muted fw-bold d-block mb-3" style={{ fontSize: '11px', letterSpacing: '0.8px' }}>
-          Detalle
-        </span>
-        <ul className="list-unstyled mb-0 pb-2 border-bottom border-light-subtle">
-          {items.map((item) => (
-            <li key={item.id} className="d-flex justify-content-between align-items-center pb-2">
-              <span className="text-dark">
-                <strong className="me-1">{item.quantity}×</strong> {item.name}
-              </span>
-              <span className="fw-semibold text-dark">{formatearDinero(item.price * item.quantity)}</span>
-            </li>
-          ))}
-        </ul>
-
-        <div className="d-flex justify-content-between align-items-baseline pt-3">
-          <span className="fw-bold fs-5 text-dark">Total</span>
-          <span className="fw-bold fs-3" style={{ color: 'var(--volcan-blue)' }}>
-            {formatearDinero(total)}
-          </span>
+        <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+          <button
+            type="button"
+            className="btn btn-outline-volcan"
+            onClick={onVolverAtras}
+          >
+            ← Volver a dirección
+          </button>
+          <button type="submit" className="btn btn-volcan">
+            Confirmar y finalizar pedido
+          </button>
         </div>
-      </div>
-
-      {/* 5. Acciones finales */}
-      <div className="d-flex justify-content-end align-items-center gap-3 pt-2">
-        <button
-          type="button"
-          className="btn btn-outline-volcan"
-          onClick={() => navigate('/')}
-        >
-          Volver al inicio
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-volcan"
-          onClick={onNuevoPedido}
-        >
-          Hacer otro pedido
-        </button>
-        <button
-          type="button"
-          className="btn btn-volcan"
-          onClick={() => navigate('/rastreo')}
-        >
-          Rastrear pedido
-        </button>
-      </div>
+      </form>
     </div>
   );
 }

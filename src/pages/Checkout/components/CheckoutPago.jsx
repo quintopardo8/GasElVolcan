@@ -1,4 +1,3 @@
-// src/pages/Checkout/components/CheckoutPago.jsx
 import { useState } from 'react';
 import {
   validarNombreTitular,
@@ -8,7 +7,7 @@ import {
 } from '../../../utils/validadoresCheckout';
 
 export default function CheckoutPago({ onConfirmar, onVolverAtras }) {
-  const [metodo, setMetodo] = useState('tarjeta'); // 'tarjeta' | 'efectivo' | 'transferencia'
+  const [metodo, setMetodo] = useState('tarjeta');
   const [datosTarjeta, setDatosTarjeta] = useState({
     titular: '',
     numero: '',
@@ -47,7 +46,10 @@ export default function CheckoutPago({ onConfirmar, onVolverAtras }) {
     }
 
     setErrores({});
-    onConfirmar({ metodo, ...(metodo === 'tarjeta' ? { titular: datosTarjeta.titular } : {}) });
+    onConfirmar({
+      metodo,
+      ...(metodo === 'tarjeta' ? { titular: datosTarjeta.titular } : {})
+    });
   };
 
   return (
@@ -60,7 +62,6 @@ export default function CheckoutPago({ onConfirmar, onVolverAtras }) {
       </p>
 
       <form onSubmit={manejarEnvio} noValidate>
-        {/* Selector de métodos con altura uniforme */}
         <div className="row g-2 mb-4">
           <div className="col-12 col-md-4">
             <button
@@ -108,7 +109,6 @@ export default function CheckoutPago({ onConfirmar, onVolverAtras }) {
           </div>
         </div>
 
-        {/* Contenedor con altura mínima para evitar saltos de layout */}
         <div style={{ minHeight: '260px' }}>
           {metodo === 'tarjeta' && (
             <div className="p-4 rounded-3 border bg-light-subtle">
@@ -196,11 +196,14 @@ export default function CheckoutPago({ onConfirmar, onVolverAtras }) {
               <p className="text-secondary small mb-3">
                 Transfiere el monto total y envía el comprobante por WhatsApp para validar el despacho.
               </p>
-              <div className="p-3 bg-white rounded border small">
+              <div className="p-3 bg-white rounded border small mb-3">
                 <div><strong>Banco:</strong> BancoEstado</div>
                 <div><strong>Tipo de Cuenta:</strong> Cuenta Corriente N° 123456789</div>
                 <div><strong>RUT:</strong> 76.543.210-K</div>
                 <div><strong>Razón Social:</strong> Distribuidora Gas El Volcán SpA</div>
+              </div>
+              <div className="alert alert-info py-2 px-3 small mb-0">
+                📱 <strong>WhatsApp para comprobantes:</strong> +56 9 0011 1222
               </div>
             </div>
           )}

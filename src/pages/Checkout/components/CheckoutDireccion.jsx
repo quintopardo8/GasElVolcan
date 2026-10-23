@@ -1,4 +1,3 @@
-// src/pages/Checkout/components/CheckoutDireccion.jsx
 import { useState } from 'react';
 import {
   validarCalleNumero,
@@ -128,7 +127,7 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
               id="phone"
               name="phone"
               className={`form-control ${errores.phone ? 'is-invalid' : ''}`}
-              placeholder="+56 9 ________"
+              placeholder="Ej: +56 9 1234 5678"
               value={formData.phone}
               onChange={manejarCambio}
             />
@@ -172,8 +171,8 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
           </div>
 
           <div className="col-12 mt-4">
-            <div className="mapa-simulado">
-              <div className="mapa-pin">📍</div>
+            <div className="mapa-simulado position-relative p-4 rounded-3 border bg-light text-center">
+              <div className="mapa-pin fs-2">📍</div>
               <div className="position-absolute bottom-0 start-0 m-3 bg-white px-3 py-2 rounded shadow-sm small fw-semibold text-dark">
                 Escribe tu dirección para ubicarla en el mapa
               </div>

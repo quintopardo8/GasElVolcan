@@ -1,4 +1,3 @@
-// src/pages/Checkout/Checkout.jsx
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Checkout.css';
@@ -25,7 +24,6 @@ export default function Checkout() {
     direccion: null,
     pago: null
   });
-  // Copia del pedido al confirmarlo: el carrito se vacía, pero la confirmación lo sigue mostrando.
   const [pedidoConfirmado, setPedidoConfirmado] = useState(null);
 
   useEffect(() => {
@@ -38,20 +36,21 @@ export default function Checkout() {
   };
 
   const manejarPasoPago = (pago) => {
-    const { street, unit, comuna, slot } = datosPedido.direccion;
+    const direccionActual = datosPedido.direccion || {};
+    const { street, unit, comuna, slot, phone, refs } = direccionActual;
+
     const pedido = {
       id: generarCodigoPedido(),
       hora: horaActual(),
       estado: 'confirmado',
       lineas: items.map((item) => ({ id: item.id, cantidad: item.quantity })),
-      pago: pago.metodo,
-      direccion: { street, unit, comuna, slot },
+      pago: pago,
+      direccion: { street, unit, comuna, slot, phone, refs }
     };
 
-    // El inicio y la página de rastreo leen este pedido.
     guardarPedidoEnCurso(pedido);
     setPedidoConfirmado({ ...pedido, items, total });
-    setDatosPedido((prev) => ({ ...prev, pago }));
+    setDatosPedido((prev) => ({ ...prev, pago, direccion: direccionActual }));
     vaciar();
     setPaso(4);
   };
@@ -62,7 +61,6 @@ export default function Checkout() {
   return (
     <div className="checkout-wrapper py-4 pb-5">
       <div className="container">
-        {/* Barra de progreso de compra conectada */}
         <div className="progreso-contenedor d-flex justify-content-center align-items-center py-3 mb-4">
           <div className="d-flex align-items-center">
             <span className="circulo-paso completado">✓</span>
@@ -97,7 +95,6 @@ export default function Checkout() {
           </div>
         </div>
 
-        {/* Vistas dinámicas según el paso */}
         {carritoVacio ? (
           <div className="checkout-card p-4 p-md-5 mx-auto text-center" style={{ maxWidth: '560px' }}>
             <div className="fs-1 mb-2" aria-hidden="true">🛒</div>
@@ -136,7 +133,6 @@ export default function Checkout() {
             </div>
 
             <div className="col-12 col-lg-4">
-              {/* Los productos se editan en el catálogo, que comparte el mismo carrito. */}
               <ResumenPedidoAside
                 cart={items}
                 onEditar={irAlCatalogo}

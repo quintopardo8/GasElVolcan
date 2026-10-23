@@ -5,7 +5,6 @@ import App from '../../App.jsx'
 import { obtenerPedidoEnCurso } from '../../utils/pedidoEnCurso.js'
 import { iniciarSesion } from '../../utils/sesion.js'
 
-// El checkout es privado y lee el carrito que arma el catálogo.
 function renderEn(ruta, carrito = {}) {
   iniciarSesion('Camila')
   localStorage.setItem('gev:carrito', JSON.stringify(carrito))
