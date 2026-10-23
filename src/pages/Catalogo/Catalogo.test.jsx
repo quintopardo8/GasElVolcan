@@ -2,8 +2,11 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import App from '../../App.jsx'
+import { iniciarSesion } from '../../utils/sesion.js'
 
+// El catálogo es una página privada: los tests parten con la sesión iniciada.
 function renderEn(ruta) {
+  iniciarSesion('Camila')
   window.history.pushState({}, '', ruta)
   const user = userEvent.setup()
   render(<App />)

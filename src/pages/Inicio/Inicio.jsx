@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import Navbar from '../../components/Navbar.jsx'
 import { obtenerPedidoEnCurso } from '../../utils/pedidoEnCurso.js'
 import HeroInicio from './components/HeroInicio.jsx'
 import PedidoEnCurso from './components/PedidoEnCurso.jsx'
@@ -14,14 +13,12 @@ export default function Inicio() {
     document.title = 'Gas El Volcán | Gas a domicilio en Chillán'
   }, [])
 
+  // El Navbar lo pone App.jsx para todas las páginas.
   return (
-    <>
-      <Navbar />
-      <main className="inicio">
-        <HeroInicio />
-        {pedido && <PedidoEnCurso pedido={pedido} />}
-        <ComoFunciona />
-      </main>
-    </>
+    <main className="inicio">
+      <HeroInicio />
+      {pedido && <PedidoEnCurso pedido={pedido} />}
+      <ComoFunciona />
+    </main>
   )
 }

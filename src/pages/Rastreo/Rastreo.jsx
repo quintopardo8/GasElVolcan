@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import Logo from '../../components/Logo.jsx'
 import ResumenPedido from './components/ResumenPedido.jsx'
 import MapaReparto from './components/MapaReparto.jsx'
 import LineaTiempo from './components/LineaTiempo.jsx'
@@ -13,10 +12,7 @@ export default function Rastreo() {
 
   return (
     <div className="rastreo">
-      <header className="site-header">
-        <Logo />
-      </header>
-
+      {/* El logo y el enlace al inicio los da el Navbar global (App.jsx). */}
       <main>
         <section className="hero" aria-labelledby="page-title">
           <p className="eyebrow">SEGUIMIENTO EN LÍNEA</p>

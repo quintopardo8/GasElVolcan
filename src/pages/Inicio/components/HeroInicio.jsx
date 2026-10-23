@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import Cilindro from '../../../components/Cilindro.jsx'
-import { PRODUCTOS } from '../../../data/productos.js'
+import { PRODUCTOS } from '../../../data/catalogo.js'
+
+// Los cilindros domésticos (5, 11 y 15 kg) que se dibujan en la portada.
+const CILINDROS_PORTADA = PRODUCTOS.filter((p) => p.kg && p.kg <= 15)
 
 export default function HeroInicio() {
   return (
@@ -20,8 +23,8 @@ export default function HeroInicio() {
         </Link>
       </div>
       <div className="inicio-hero-cilindros" aria-hidden="true">
-        {PRODUCTOS.map((p) => (
-          <Cilindro key={p.id} kg={p.kg} />
+        {CILINDROS_PORTADA.map((p) => (
+          <Cilindro key={p.codigo} kg={p.kg} />
         ))}
       </div>
     </section>

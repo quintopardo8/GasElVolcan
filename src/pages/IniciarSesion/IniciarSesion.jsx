@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validarCorreo, validarContrasena } from "./validadores";
+import { iniciarSesion, nombreDesdeCorreo } from "../../utils/sesion.js";
 import TarjetaSesion from "./components/TarjetaSesion.jsx";
 import CampoSesion from "./components/CampoSesion.jsx";
 import SelectorSesion from "./components/SelectorSesion.jsx";
 import "./IniciarSesion.css";
 
 export default function IniciarSesion() {
+  const navigate = useNavigate();
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errores, setErrores] = useState({ correo: "", contrasena: "" });
@@ -33,10 +35,12 @@ export default function IniciarSesion() {
     });
 
     if (!errorCorreo && !errorContrasena) {
-      console.log("Formulario válido");
-      // Aquí irá el login real (llamada al backend)
+      // Aquí irá el login real (llamada al backend). Mientras tanto se guarda
+      // una sesión simulada y se entra al inicio.
+      iniciarSesion(nombreDesdeCorreo(correo));
       setCorreo("");
       setContrasena("");
+      navigate("/", { replace: true });
     }
   };
 

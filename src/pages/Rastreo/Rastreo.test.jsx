@@ -20,12 +20,6 @@ describe('Rastreo - textos', () => {
     expect(document.title).toBe('Rastrea tu pedido | Gas El Volcán')
   })
 
-  it('muestra el logo con enlace al inicio', () => {
-    renderRastreo()
-    const logo = screen.getByRole('img', { name: 'Logo Distribuidora de Gas' })
-    expect(logo.closest('a')).toHaveAttribute('href', '/')
-  })
-
   it('muestra el resumen del pedido', () => {
     renderRastreo()
     expect(screen.getByRole('heading', { level: 2, name: '¡Tu pedido está en camino!' })).toBeInTheDocument()

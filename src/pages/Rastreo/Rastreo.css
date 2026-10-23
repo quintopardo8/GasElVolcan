@@ -407,11 +407,6 @@
 }
 
 @media (max-width: 620px) {
-    /* El logo deja de flotar (ver Logo.css), así que necesita aire arriba. */
-    .rastreo .site-header {
-        padding-top: 18px;
-    }
-
     .rastreo main {
         width: calc(100% - 28px);
         margin-top: 18px;

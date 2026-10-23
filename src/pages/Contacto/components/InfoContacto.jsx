@@ -1,7 +1,7 @@
 const CANALES = [
-  { titulo: 'Teléfono Principal', detalle: '+51 912 345 678 (Pedidos y Consultas)' },
-  { titulo: 'Línea de Respaldo', detalle: '+51 998 877 665 (Emergencias / Si la principal no conecta)' },
-  { titulo: 'WhatsApp Directo', detalle: '+51 900 111 222' },
+  { titulo: 'Teléfono Principal', detalle: '+56 9 1234 5678 (Pedidos y Consultas)' },
+  { titulo: 'Línea de Respaldo', detalle: '+56 9 9887 7665 (Emergencias / Si la principal no conecta)' },
+  { titulo: 'WhatsApp Directo', detalle: '+56 9 0011 1222' },
   { titulo: 'Horario', detalle: 'Lunes a Sábado de 7:00 am a 8:00 pm' },
 ]
 

@@ -44,13 +44,13 @@ describe('Inicio', () => {
       id: 'EV-48213',
       hora: '17:42',
       estado: 'en-camino',
-      lineas: [{ id: 'c11', cantidad: 2 }, { id: 'c5', cantidad: 1 }],
+      lineas: [{ id: 'CL002', cantidad: 2 }, { id: 'CL001', cantidad: 1 }],
     })
     renderInicio()
 
     const pedido = screen.getByRole('region', { name: 'Pedido en curso' })
     expect(within(pedido).getByRole('heading', { name: 'N° EV-48213' })).toBeInTheDocument()
-    expect(pedido).toHaveTextContent('2 × 11 kg, 1 × 5 kg · $61.300')
+    expect(pedido).toHaveTextContent('2 × Cilindro GLP 11 kg, 1 × Cilindro GLP 5 kg · $30.500')
     expect(within(pedido).getByRole('link', { name: 'Rastrea tu pedido' })).toHaveAttribute('href', '/rastreo')
 
     const pasos = within(pedido).getAllByRole('listitem')

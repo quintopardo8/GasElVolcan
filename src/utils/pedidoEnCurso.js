@@ -1,4 +1,4 @@
-import { buscarProducto } from '../data/productos.js'
+import { buscarProducto } from '../data/catalogo.js'
 
 // El checkout guarda aquí el pedido al confirmarlo; el inicio lo lee para mostrar
 // el seguimiento y enlazar a /rastreo.
@@ -14,7 +14,8 @@ export const ESTADOS_PEDIDO = [
 
 /**
  * Forma esperada:
- * { id: 'EV-48213', hora: '17:42', estado: 'en-camino', lineas: [{ id: 'c15', cantidad: 1 }] }
+ * { id: 'EV-48213', hora: '17:42', estado: 'en-camino', lineas: [{ id: 'CL003', cantidad: 1 }] }
+ * (id = código del producto en data/catalogo.js)
  */
 export function guardarPedidoEnCurso(pedido) {
   try {
