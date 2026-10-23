@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import Navbar from './components/Navbar.jsx'
 import Inicio from './pages/Inicio/Inicio.jsx'
 import Catalogo from './pages/Catalogo/Catalogo.jsx'
