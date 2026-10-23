@@ -1,8 +1,10 @@
 /* Todo con prefijo .contacto: en React el CSS importado es global,
    así no afecta a las demás vistas. */
 .contacto {
-    width: 100%;
+    width: calc(100% - 40px);
     max-width: 600px;
+    /* Se centra solo: el body global (index.css compartido) ya no lo centra. */
+    margin: 40px auto;
     background: var(--card-bg);
     border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 16px;
@@ -89,6 +91,8 @@
 
 @media (max-width: 600px) {
     .contacto {
+        width: calc(100% - 32px);
+        margin: 24px auto;
         padding: 24px 20px;
         border-radius: 12px;
     }
