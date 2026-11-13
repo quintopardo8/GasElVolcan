@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { iniciarSesion, primerNombre } from "../../utils/sesion.js";
+import { guardarSesionDesdeApi } from "../../utils/sesion.js";
+import { auth } from "../../utils/api.js";
 import {
   validarNombre,
   validarCorreo,
@@ -25,15 +26,17 @@ export default function Registrarse() {
   const navigate = useNavigate();
   const [datos, setDatos] = useState(VACIO);
   const [errores, setErrores] = useState(VACIO);
-
+  const [errorServidor, setErrorServidor] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDatos((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: "" }));
+    setErrorServidor("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const nuevosErrores = {
@@ -47,12 +50,22 @@ export default function Registrarse() {
     setErrores(nuevosErrores);
 
     const hayErrores = Object.values(nuevosErrores).some(Boolean);
-    if (!hayErrores) {
-      // Aquí irá el registro real (llamada al backend). Mientras tanto se guarda
-      // una sesión simulada y se entra al inicio.
-      iniciarSesion(primerNombre(datos.nombre));
-      setDatos(VACIO);
+    if (hayErrores || enviando) return;
+
+    // Registro real contra usuarios-service: crea un CLIENTE y deja la sesión iniciada.
+    setEnviando(true);
+    try {
+      const respuesta = await auth.registro({
+        nombre: datos.nombre.trim(),
+        correo: datos.correo.trim(),
+        telefono: datos.telefono.trim(),
+        contrasena: datos.contrasena,
+      });
+      guardarSesionDesdeApi(respuesta);
       navigate("/", { replace: true });
+    } catch (error) {
+      setErrorServidor(error.message);
+      setEnviando(false);
     }
   };
 
@@ -112,7 +125,12 @@ export default function Registrarse() {
       />
 
       <br />
-      <button type="submit" >Crear cuenta</button>
+      {errorServidor && (
+        <p className="error" role="alert">{errorServidor}</p>
+      )}
+      <button type="submit" disabled={enviando}>
+        {enviando ? "Creando cuenta..." : "Crear cuenta"}
+      </button>
         <br /><br />
     </TarjetaSesion>
   );

@@ -1,5 +1,9 @@
-// Sesión simulada mientras no haya backend: solo recuerda que el cliente ingresó y su nombre.
+// Sesión del usuario guardada en el navegador.
+// Con el backend guarda también el token JWT y el rol que devuelve /api/auth/login.
 const CLAVE = 'gev:sesion'
+
+// Roles que pueden entrar al panel de administración.
+export const ROLES_PERSONAL = ['ADMINISTRADOR', 'OPERADORA']
 
 export function obtenerSesion() {
   try {
@@ -14,12 +18,27 @@ export function haySesion() {
   return obtenerSesion() !== null
 }
 
-export function iniciarSesion(nombre) {
+/**
+ * Guarda la sesión.
+ * @param {string} nombre nombre a mostrar en el navbar
+ * @param {{ token?: string, rol?: string, id?: number, correo?: string }} [extra] datos que entrega el backend
+ */
+export function iniciarSesion(nombre, extra = {}) {
   try {
-    localStorage.setItem(CLAVE, JSON.stringify({ nombre }))
+    localStorage.setItem(CLAVE, JSON.stringify({ ...extra, nombre }))
   } catch {
     // Sin almacenamiento (modo privado, etc.): no se puede recordar la sesión.
   }
+}
+
+/** Guarda la respuesta de /api/auth/login o /api/auth/registro: { token, usuario }. */
+export function guardarSesionDesdeApi({ token, usuario }) {
+  iniciarSesion(primerNombre(usuario.nombre), {
+    token,
+    rol: usuario.rol,
+    id: usuario.id,
+    correo: usuario.correo,
+  })
 }
 
 export function cerrarSesion() {
@@ -28,6 +47,18 @@ export function cerrarSesion() {
   } catch {
     // Nada que borrar.
   }
+}
+
+export function obtenerToken() {
+  return obtenerSesion()?.token || null
+}
+
+export function obtenerRol() {
+  return obtenerSesion()?.rol || null
+}
+
+export function esPersonal(rol = obtenerRol()) {
+  return ROLES_PERSONAL.includes(rol)
 }
 
 // "camila.rojas@correo.cl" → "Camila"

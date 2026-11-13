@@ -10,7 +10,12 @@ import Rastreo from './pages/Rastreo/Rastreo.jsx'
 import IniciarSesion from './pages/IniciarSesion/IniciarSesion.jsx'
 import RecuperarContrasena from './pages/IniciarSesion/RecuperarContrasena.jsx'
 import Registrarse from './pages/IniciarSesion/Registrarse.jsx'
-import { haySesion } from './utils/sesion.js'
+import AdminLayout from './pages/Admin/AdminLayout.jsx'
+import ResumenAdmin from './pages/Admin/ResumenAdmin.jsx'
+import PedidosAdmin from './pages/Admin/PedidosAdmin.jsx'
+import UsuariosAdmin from './pages/Admin/UsuariosAdmin.jsx'
+import ProductosAdmin from './pages/Admin/ProductosAdmin.jsx'
+import { haySesion, obtenerRol, ROLES_PERSONAL } from './utils/sesion.js'
 
 // Las pantallas de sesión se muestran sin navbar.
 const RUTAS_DE_SESION = ['/iniciar-sesion', '/registro', '/recuperar-contrasena']
@@ -20,9 +25,16 @@ function Privada({ children }) {
   return haySesion() ? children : <Navigate to="/iniciar-sesion" replace />
 }
 
+// Además de la sesión, exige uno de los roles indicados (si no, redirige).
+function SoloRoles({ roles, redirigirA = '/', children }) {
+  if (!haySesion()) return <Navigate to="/iniciar-sesion" replace />
+  return roles.includes(obtenerRol()) ? children : <Navigate to={redirigirA} replace />
+}
+
 function Contenido() {
   const { pathname } = useLocation()
-  const mostrarNavbar = haySesion() && !RUTAS_DE_SESION.includes(pathname)
+  // El panel de administración tiene su propio menú lateral.
+  const mostrarNavbar = haySesion() && !RUTAS_DE_SESION.includes(pathname) && !pathname.startsWith('/admin')
 
   return (
     <>
@@ -36,6 +48,15 @@ function Contenido() {
         <Route path="/iniciar-sesion" element={<IniciarSesion />} />
         <Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
         <Route path="/registro" element={<Registrarse />} />
+
+        {/* Panel de administración: administradora y operadora. Usuarios y productos, solo administradora. */}
+        <Route path="/admin" element={<SoloRoles roles={ROLES_PERSONAL}><AdminLayout /></SoloRoles>}>
+          <Route index element={<ResumenAdmin />} />
+          <Route path="pedidos" element={<PedidosAdmin />} />
+          <Route path="usuarios" element={<SoloRoles roles={['ADMINISTRADOR']} redirigirA="/admin"><UsuariosAdmin /></SoloRoles>} />
+          <Route path="productos" element={<SoloRoles roles={['ADMINISTRADOR']} redirigirA="/admin"><ProductosAdmin /></SoloRoles>} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
+        </Route>
       </Routes>
     </>
   )

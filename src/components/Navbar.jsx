@@ -2,7 +2,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import './Navbar.css';
 import logoVolcan from '../assets/ElVolcan.png';
-import { cerrarSesion, obtenerSesion } from '../utils/sesion.js';
+import { cerrarSesion, esPersonal, obtenerSesion } from '../utils/sesion.js';
 import { useCarrito } from '../context/CarritoContext.js';
 
 export default function Navbar() {
@@ -28,6 +28,9 @@ export default function Navbar() {
             <NavLink to="/" end className="nav-link-volcan">Inicio</NavLink>
             <NavLink to="/catalogo" className="nav-link-volcan">Catálogo</NavLink>
             <NavLink to="/contacto" className="nav-link-volcan">Contacto</NavLink>
+            {esPersonal(sesion?.rol) && (
+              <NavLink to="/admin" className="nav-link-volcan">Administración</NavLink>
+            )}
           </nav>
         </div>
 
