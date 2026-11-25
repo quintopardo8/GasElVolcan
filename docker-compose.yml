@@ -1,80 +1,19 @@
-# Levanta todo el sistema:  docker compose up --build
-#   Frontend + panel admin  → http://localhost:8080
-#   usuarios-service (API)  → http://localhost:8081
-#   pedidos-service (API)   → http://localhost:8082
-#   PostgreSQL              → localhost:5433 (usuario volcan)
-# Los valores entre ${...} se pueden cambiar en un archivo .env (ver .env.example).
-name: gas-el-volcan
-
-x-entorno-comun: &entorno-comun
-  DB_HOST: postgres
-  DB_PORT: "5432"
-  DB_USER: volcan
-  DB_PASSWORD: ${DB_PASSWORD:-volcan123}
-  JWT_SECRET: ${JWT_SECRET:-desarrollo-cambia-este-secreto-por-uno-largo-y-aleatorio}
-  CORS_ORIGENES: ${CORS_ORIGENES:-http://localhost:5173,http://localhost:8080}
-  TZ: America/Santiago
+# Frontend de Gas El Volcán (React compilado + nginx).
+#   docker compose up -d --build   → http://localhost:8080
+# nginx reenvía /api/... al backend (repositorio gaselvolcan-backend).
+# Local: el backend corre en la misma PC → host.docker.internal.
+# AWS:   en .env pon la IP PRIVADA de la EC2 del backend (ver .env.example).
+name: gas-el-volcan-frontend
 
 services:
-  postgres:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: volcan
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-volcan123}
-      # Base del primer microservicio; la segunda la crea backend/postgres/init.sql.
-      POSTGRES_DB: gas_usuarios
-      TZ: America/Santiago
-    ports:
-      # 5433 en tu PC para no chocar con un PostgreSQL que ya tengas instalado.
-      - "${POSTGRES_PORT:-5433}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
-    healthcheck:
-      # Por TCP: durante la inicialización PostgreSQL solo escucha por socket local,
-      # así que esto responde recién cuando terminó y ya existen ambas bases.
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U volcan -d gas_pedidos"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
-      start_period: 30s
-
-  usuarios-service:
-    build: ./backend/usuarios-service
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      <<: *entorno-comun
-      DB_NAME: gas_usuarios
-      ADMIN_CORREO: ${ADMIN_CORREO:-admin@elvolcan.cl}
-      ADMIN_CONTRASENA: ${ADMIN_CONTRASENA:-Admin1234}
-      DATOS_DEMO: ${DATOS_DEMO:-true}
-    ports:
-      - "8081:8081"
-
-  pedidos-service:
-    build: ./backend/pedidos-service
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      <<: *entorno-comun
-      DB_NAME: gas_pedidos
-    ports:
-      - "8082:8082"
-
   frontend:
     build: .
     restart: unless-stopped
-    depends_on:
-      - usuarios-service
-      - pedidos-service
+    environment:
+      USUARIOS_API: ${USUARIOS_API:-http://host.docker.internal:8081}
+      PEDIDOS_API: ${PEDIDOS_API:-http://host.docker.internal:8082}
+    extra_hosts:
+      # En Linux (EC2) host.docker.internal no existe por defecto.
+      - "host.docker.internal:host-gateway"
     ports:
       - "${FRONTEND_PORT:-8080}:80"
-
-volumes:
-  postgres_data:
