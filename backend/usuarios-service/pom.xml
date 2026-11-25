@@ -23,6 +23,7 @@
         <java.version>21</java.version>
         <!-- Única dependencia fuera del BOM de Spring Boot: misma versión en ambos microservicios. -->
         <jjwt.version>0.12.6</jjwt.version>
+        <springdoc.version>2.8.11</springdoc.version>
     </properties>
 
     <dependencies>
@@ -46,6 +47,13 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Documentación OpenAPI + Swagger UI (/swagger-ui.html). 2.8.11 está alineada con Spring Boot 3.5.x -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
 
         <dependency>

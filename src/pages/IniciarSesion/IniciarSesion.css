@@ -168,3 +168,16 @@ body:has(.pagina-sesion) {
   outline: 2px solid #4589FF;
   border-color: transparent;
 }
+/* Aviso de por qué se llegó al login (sesión cerrada, expirada o página privada) */
+.aviso-sesion {
+  margin: .5rem 0 0;
+  padding: .6rem .9rem;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: #0c4a6e;
+  font-size: .9rem;
+}
+.aviso-sesion.aviso-alerta {
+  background: #fef3c7;
+  color: #92400e;
+}

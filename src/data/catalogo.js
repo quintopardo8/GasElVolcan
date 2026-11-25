@@ -1,4 +1,7 @@
 // Catálogo de productos y tarifas de la Distribuidora de Gas El Volcán.
+// IMPORTANTE: la tienda ya NO usa esta lista para mostrar el catálogo; los productos
+// vienen de la base de datos (ver context/CatalogoProvider.jsx). Esta copia queda como
+// datos de la portada, de los tests y como respaldo mientras carga la API.
 // Fuente: "Catalogo Distribuidora Gas El Volcan.xlsx" (hoja "Productos y Tarifas").
 // precio = precio residencial (CLP); precioComercial queda disponible para clientes comerciales.
 
@@ -85,8 +88,16 @@ export const PRODUCTOS = [
 // Desde este stock se avisa "Últimas unidades".
 export const STOCK_BAJO = 15;
 
+// Productos que llegaron desde la API (GET /api/productos). Mientras no lleguen,
+// se usa la lista local de arriba solo para poder leer el carrito guardado.
+let productosDesdeApi = null;
+
+export function registrarProductos(lista) {
+  productosDesdeApi = Array.isArray(lista) ? lista : null;
+}
+
 export function buscarProducto(codigo) {
-  return PRODUCTOS.find((p) => p.codigo === codigo);
+  return (productosDesdeApi ?? PRODUCTOS).find((p) => p.codigo === codigo);
 }
 
 export function formatearDinero(monto) {

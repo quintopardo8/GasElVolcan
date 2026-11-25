@@ -41,9 +41,10 @@ export async function api(ruta, { metodo = 'GET', cuerpo } = {}) {
 
   if (!respuesta.ok) {
     // Token vencido o inválido: se cierra la sesión y se vuelve al login.
-    if (respuesta.status === 401 && token) {
+    // (No aplica al login: ahí 401 significa "correo o contraseña incorrectos".)
+    if (respuesta.status === 401 && token && !ruta.startsWith('/api/auth/login')) {
       cerrarSesion()
-      window.location.assign('/iniciar-sesion')
+      window.location.assign('/iniciar-sesion?expirada=1')
     }
     const campos = datos?.campos || null
     const mensaje =

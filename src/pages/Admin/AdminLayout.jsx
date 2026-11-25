@@ -23,7 +23,7 @@ export default function AdminLayout() {
 
   const salir = () => {
     cerrarSesion()
-    navigate('/iniciar-sesion', { replace: true })
+    navigate('/iniciar-sesion', { replace: true, state: { motivo: 'cerrada' } })
   }
 
   return (

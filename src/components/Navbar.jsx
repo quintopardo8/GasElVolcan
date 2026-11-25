@@ -1,12 +1,19 @@
 // src/components/Navbar.jsx
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import logoVolcan from '../assets/ElVolcan.png';
 import { cerrarSesion, esPersonal, obtenerSesion } from '../utils/sesion.js';
 import { useCarrito } from '../context/CarritoContext.js';
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const sesion = obtenerSesion();
+
+  // Cerrar sesión: se borra el token y el rol del navegador y se vuelve al login.
+  const salir = () => {
+    cerrarSesion();
+    navigate('/iniciar-sesion', { replace: true, state: { motivo: 'cerrada' } });
+  };
   const { totalUnidades } = useCarrito();
   const etiquetaCarrito = totalUnidades === 0
     ? 'Ver carrito: vacío'
@@ -45,19 +52,28 @@ export default function Navbar() {
             )}
           </Link>
 
-          <span className="usuario-texto">
-            Hola, <strong className="usuario-nombre">{sesion?.nombre}</strong>
-          </span>
+          {sesion ? (
+            <>
+              <span className="usuario-texto">
+                Hola, <strong className="usuario-nombre">{sesion.nombre}</strong>
+              </span>
 
-          <Link
-            to="/iniciar-sesion"
-            onClick={cerrarSesion}
-            className="icon-interactivo"
-            title="Cerrar sesión"
-            aria-label="Cerrar sesión"
-          >
-            <span aria-hidden="true">🚪</span>
-          </Link>
+              <button
+                type="button"
+                onClick={salir}
+                className="icon-interactivo boton-salir"
+                title="Cerrar sesión"
+                aria-label="Cerrar sesión"
+              >
+                <span aria-hidden="true">🚪</span>
+              </button>
+            </>
+          ) : (
+            // Visitante sin sesión: puede navegar la tienda y entrar cuando quiera.
+            <Link to="/iniciar-sesion" className="boton-ingresar">
+              Iniciar sesión
+            </Link>
+          )}
         </div>
       </div>
     </header>

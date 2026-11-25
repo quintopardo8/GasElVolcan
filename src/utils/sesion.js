@@ -5,10 +5,57 @@ const CLAVE = 'gev:sesion'
 // Roles que pueden entrar al panel de administración.
 export const ROLES_PERSONAL = ['ADMINISTRADOR', 'OPERADORA']
 
+// Gestión de sesión en el frontend:
+// - Al iniciar sesión se guarda { token, rol, id, correo, nombre } en localStorage,
+//   por eso la sesión sobrevive a una recarga de la página (F5).
+// - El token JWT trae su fecha de vencimiento (claim "exp"): si ya venció, la sesión
+//   se descarta sola y el usuario vuelve al login (ver también <VigilanteSesion> en App.jsx).
+// - Cada llamada a la API adjunta "Authorization: Bearer <token>" (ver utils/api.js).
+
 export function obtenerSesion() {
   try {
     const sesion = JSON.parse(localStorage.getItem(CLAVE))
-    return sesion && sesion.nombre ? sesion : null
+    if (!sesion || !sesion.nombre) return null
+    if (sesion.token && tokenVencido(sesion.token)) {
+      localStorage.removeItem(CLAVE)
+      return null
+    }
+    return sesion
+  } catch {
+    return null
+  }
+}
+
+/** Lee el payload del JWT (sin verificar la firma: eso lo hace el backend). */
+export function leerPayloadToken(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const json = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+        .join(''),
+    )
+    return JSON.parse(json)
+  } catch {
+    return null
+  }
+}
+
+/** Milisegundos que le quedan al token, o null si no trae fecha de vencimiento. */
+export function msHastaVencer(token = obtenerTokenCrudo()) {
+  const exp = token ? leerPayloadToken(token)?.exp : null
+  return typeof exp === 'number' ? exp * 1000 - Date.now() : null
+}
+
+function tokenVencido(token) {
+  const restante = msHastaVencer(token)
+  return restante !== null && restante <= 0
+}
+
+function obtenerTokenCrudo() {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE))?.token || null
   } catch {
     return null
   }

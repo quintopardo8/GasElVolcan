@@ -1,5 +1,6 @@
 package cl.elvolcan.pedidos.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import cl.elvolcan.pedidos.dto.CategoriaRequest;
 import cl.elvolcan.pedidos.dto.CategoriaResponse;
 import cl.elvolcan.pedidos.servicio.CatalogoService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Categorías", description = "Lectura pública; crear, editar y eliminar solo ADMINISTRADOR.")
 @RestController
 @RequestMapping("/api/categorias")
 public class CategoriaController {
@@ -27,7 +29,7 @@ public class CategoriaController {
         this.servicio = servicio;
     }
 
-    /** Cualquier usuario con sesión. */
+    /** Público: lo usa el catálogo de la tienda. */
     @GetMapping
     public List<CategoriaResponse> listar() {
         return servicio.listarCategorias();

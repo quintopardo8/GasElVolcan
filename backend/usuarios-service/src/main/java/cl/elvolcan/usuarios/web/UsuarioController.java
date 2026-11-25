@@ -1,5 +1,6 @@
 package cl.elvolcan.usuarios.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import cl.elvolcan.usuarios.dto.CambioActivoRequest;
 import cl.elvolcan.usuarios.dto.CambioRolRequest;
 import cl.elvolcan.usuarios.dto.UsuarioRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /** CRUD de usuarios. Solo el rol ADMINISTRADOR, salvo la lista de repartidores. */
+@Tag(name = "Usuarios", description = "CRUD de usuarios y asignación de roles (solo ADMINISTRADOR).")
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {

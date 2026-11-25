@@ -7,10 +7,9 @@ import CheckoutConfirmacion from './components/CheckoutConfirmacion';
 import ResumenPedidoAside from "../../components/ResumenPedidoAside.jsx";
 import { useCarrito } from '../../context/CarritoContext.js';
 import { guardarPedidoEnCurso } from '../../utils/pedidoEnCurso.js';
-
-function generarCodigoPedido() {
-  return `EV-${Math.floor(10000 + Math.random() * 90000)}`;
-}
+import { pedidosApi } from '../../utils/api.js';
+import { esPersonal, obtenerSesion } from '../../utils/sesion.js';
+import { useCatalogo } from '../../context/CatalogoContext.js';
 
 function horaActual() {
   return new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
@@ -25,6 +24,9 @@ export default function Checkout() {
     pago: null
   });
   const [pedidoConfirmado, setPedidoConfirmado] = useState(null);
+  const [enviando, setEnviando] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState('');
+  const { recargar: recargarCatalogo } = useCatalogo();
 
   useEffect(() => {
     document.title = 'Checkout | Gas El Volcán';
@@ -35,12 +37,40 @@ export default function Checkout() {
     setPaso(3);
   };
 
-  const manejarPasoPago = (pago) => {
+  // Paso final: el pedido se guarda en la base de datos (POST /api/pedidos con el token del cliente).
+  // El backend valida stock, calcula el total con los precios vigentes y descuenta el stock.
+  const manejarPasoPago = async (pago) => {
+    if (enviando) return;
     const direccionActual = datosPedido.direccion || {};
     const { street, unit, comuna, slot, phone, refs } = direccionActual;
 
+    setEnviando(true);
+    setErrorEnvio('');
+    let creado;
+    try {
+      creado = await pedidosApi.crear({
+        // El cliente queda con el nombre de su cuenta; si compra el personal, se usa su nombre.
+        clienteNombre: esPersonal() ? obtenerSesion()?.nombre : null,
+        telefono: phone,
+        calle: street,
+        depto: unit || null,
+        comuna,
+        referencia: refs || null,
+        franja: slot || null,
+        metodoPago: String(pago.metodo).toUpperCase(),
+        lineas: items.map((item) => ({ codigo: item.id, cantidad: item.quantity })),
+      });
+    } catch (error) {
+      setErrorEnvio(error.estado === 403
+        ? 'Tu cuenta no puede realizar pedidos desde la tienda.'
+        : error.message);
+      setEnviando(false);
+      return;
+    }
+
     const pedido = {
-      id: generarCodigoPedido(),
+      id: creado?.codigo || `EV-${creado?.id ?? ''}`,
+      idApi: creado?.id,
       hora: horaActual(),
       estado: 'confirmado',
       lineas: items.map((item) => ({ id: item.id, cantidad: item.quantity })),
@@ -49,10 +79,13 @@ export default function Checkout() {
     };
 
     guardarPedidoEnCurso(pedido);
-    setPedidoConfirmado({ ...pedido, items, total });
+    setPedidoConfirmado({ ...pedido, items, total: creado?.total ?? total });
     setDatosPedido((prev) => ({ ...prev, pago, direccion: direccionActual }));
     vaciar();
+    setEnviando(false);
     setPaso(4);
+    // El stock cambió en la base de datos: el catálogo se vuelve a leer.
+    recargarCatalogo();
   };
 
   const irAlCatalogo = () => navigate('/catalogo');
@@ -124,6 +157,12 @@ export default function Checkout() {
                 />
               )}
 
+              {paso === 3 && errorEnvio && (
+                <div className="alert alert-danger" role="alert">{errorEnvio}</div>
+              )}
+              {paso === 3 && enviando && (
+                <div className="alert alert-info" role="status">Registrando tu pedido…</div>
+              )}
               {paso === 3 && (
                 <CheckoutPago
                   onConfirmar={manejarPasoPago}

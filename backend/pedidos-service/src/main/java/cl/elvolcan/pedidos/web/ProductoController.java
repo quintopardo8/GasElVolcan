@@ -1,5 +1,6 @@
 package cl.elvolcan.pedidos.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import cl.elvolcan.pedidos.dto.ProductoRequest;
 import cl.elvolcan.pedidos.dto.ProductoResponse;
 import cl.elvolcan.pedidos.dto.StockRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Productos", description = "Catálogo: lectura pública; crear, editar, stock y eliminar solo ADMINISTRADOR.")
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoController {
@@ -32,11 +34,13 @@ public class ProductoController {
         this.servicio = servicio;
     }
 
-    /** GET /api/productos → activos. ?todos=true incluye inactivos (solo personal interno). */
+    /** GET /api/productos (público) → activos. ?todos=true incluye inactivos (solo personal interno). */
     @GetMapping
     public List<ProductoResponse> listar(@RequestParam(defaultValue = "false") boolean todos,
                                          @AuthenticationPrincipal UsuarioAutenticado actual) {
-        boolean esPersonal = "ADMINISTRADOR".equals(actual.rol()) || "OPERADORA".equals(actual.rol());
+        // Público: sin token "actual" es null y solo se listan los activos.
+        boolean esPersonal = actual != null
+                && ("ADMINISTRADOR".equals(actual.rol()) || "OPERADORA".equals(actual.rol()));
         return servicio.listarProductos(todos && esPersonal);
     }
 

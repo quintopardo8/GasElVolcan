@@ -1,15 +1,16 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../../App.jsx'
 import { iniciarSesion } from '../../utils/sesion.js'
 
-// El catálogo es una página privada: los tests parten con la sesión iniciada.
-function renderEn(ruta) {
-  iniciarSesion('Camila')
+// El catálogo es público; los productos llegan desde la API (fetch falso de src/test/apiFalsa.js).
+async function renderEn(ruta, { conSesion = true } = {}) {
+  if (conSesion) iniciarSesion('Camila')
   window.history.pushState({}, '', ruta)
   const user = userEvent.setup()
   render(<App />)
+  if (ruta === '/catalogo') await screen.findByRole('heading', { name: 'Cilindro GLP 11 kg' })
   return user
 }
 
@@ -20,8 +21,8 @@ describe('Catálogo', () => {
     localStorage.clear()
   })
 
-  it('muestra los 14 productos del catálogo con precio residencial y el título de la pestaña', () => {
-    renderEn('/catalogo')
+  it('muestra los 14 productos que entrega la API con precio residencial y el título de la pestaña', async () => {
+    await renderEn('/catalogo')
     expect(screen.getByRole('heading', { level: 1, name: 'Elige tus productos' })).toBeInTheDocument()
     expect(screen.getAllByRole('article')).toHaveLength(14)
     const cilindro = screen.getByRole('heading', { name: 'Cilindro GLP 11 kg' }).closest('article')
@@ -30,7 +31,7 @@ describe('Catálogo', () => {
   })
 
   it('filtra por categoría', async () => {
-    const user = renderEn('/catalogo')
+    const user = await renderEn('/catalogo')
 
     await user.click(screen.getByRole('button', { name: 'Reguladores' }))
     expect(screen.getByRole('button', { name: 'Reguladores' })).toHaveAttribute('aria-pressed', 'true')
@@ -41,14 +42,14 @@ describe('Catálogo', () => {
     expect(screen.getAllByRole('article')).toHaveLength(14)
   })
 
-  it('avisa cuando quedan pocas unidades', () => {
-    renderEn('/catalogo')
+  it('avisa cuando quedan pocas unidades', async () => {
+    await renderEn('/catalogo')
     const detector = screen.getByRole('heading', { name: 'Detector de gas a batería' }).closest('article')
     expect(detector).toHaveTextContent('Últimas 8 unidades')
   })
 
   it('agregar, sumar, restar y quitar actualizan el pedido y el total', async () => {
-    const user = renderEn('/catalogo')
+    const user = await renderEn('/catalogo')
     expect(within(pedido()).getByText('Tu carrito está vacío')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continuar a dirección →' })).toBeDisabled()
 
@@ -69,7 +70,7 @@ describe('Catálogo', () => {
   })
 
   it('no deja agregar más unidades que el stock', async () => {
-    const user = renderEn('/catalogo')
+    const user = await renderEn('/catalogo')
     const agregar = screen.getByRole('button', { name: 'Agregar Detector de gas a batería al pedido' })
 
     for (let i = 0; i < 10; i++) {
@@ -82,13 +83,27 @@ describe('Catálogo', () => {
   })
 
   it('el carrito se mantiene al recargar la página', async () => {
-    const user = renderEn('/catalogo')
+    const user = await renderEn('/catalogo')
     await user.click(screen.getByRole('button', { name: 'Agregar Cilindro GLP 5 kg al pedido' }))
     expect(JSON.parse(localStorage.getItem('gev:carrito'))).toEqual({ CL001: 1 })
   })
 
+  it('se ve sin iniciar sesión y pide los productos a GET /api/productos', async () => {
+    await renderEn('/catalogo', { conSesion: false })
+    expect(screen.getAllByRole('article')).toHaveLength(14)
+    expect(fetch).toHaveBeenCalledWith('/api/productos', expect.objectContaining({ method: 'GET' }))
+  })
+
+  it('si la API falla muestra el error y permite reintentar', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('sin red'))))
+    window.history.pushState({}, '', '/catalogo')
+    render(<App />)
+    expect(await screen.findByText('No pudimos cargar el catálogo.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument()
+  })
+
   it('"Continuar a dirección" lleva al checkout', async () => {
-    const user = renderEn('/catalogo')
+    const user = await renderEn('/catalogo')
     await user.click(screen.getByRole('button', { name: 'Agregar Cilindro GLP 15 kg al pedido' }))
     await user.click(screen.getByRole('button', { name: 'Continuar a dirección →' }))
     expect(window.location.pathname).toBe('/checkout')

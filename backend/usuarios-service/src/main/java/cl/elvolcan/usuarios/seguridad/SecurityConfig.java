@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Únicas rutas públicas: iniciar sesión y registro de clientes.
                         .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registro").permitAll()
+                        // Documentación Swagger / OpenAPI: pública para poder leerla; los endpoints igual exigen token.
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())

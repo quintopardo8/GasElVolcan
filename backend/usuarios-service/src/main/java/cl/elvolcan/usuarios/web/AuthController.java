@@ -1,5 +1,6 @@
 package cl.elvolcan.usuarios.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import cl.elvolcan.usuarios.dto.AuthResponse;
 import cl.elvolcan.usuarios.dto.LoginRequest;
 import cl.elvolcan.usuarios.dto.RegistroRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Autenticación", description = "Login y registro (públicos): devuelven el JWT con el rol del usuario.")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

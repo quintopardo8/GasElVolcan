@@ -1,5 +1,6 @@
 package cl.elvolcan.pedidos.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import cl.elvolcan.pedidos.dto.AsignarRequest;
 import cl.elvolcan.pedidos.dto.EstadoRequest;
 import cl.elvolcan.pedidos.dto.PedidoRequest;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Pedidos", description = "Ciclo del pedido: PENDIENTE → ASIGNADO → EN_CAMINO → ENTREGADO / CANCELADO.")
 @RestController
 @RequestMapping("/api/pedidos")
 public class PedidoController {

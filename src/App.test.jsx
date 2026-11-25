@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App.jsx'
 import { guardarPedidoEnCurso, limpiarPedidoEnCurso } from './utils/pedidoEnCurso.js'
 import { cerrarSesion, iniciarSesion } from './utils/sesion.js'
+import { crearFetchFalso } from './test/apiFalsa.js'
 
 // Por defecto los tests parten con la sesión iniciada.
 function renderEn(ruta, { conSesion = true } = {}) {
@@ -16,18 +17,18 @@ function renderEn(ruta, { conSesion = true } = {}) {
 
 const navbar = () => screen.getByRole('navigation', { name: 'Navegación principal' })
 
-// Simula las respuestas del backend: cada llamada a fetch devuelve la siguiente respuesta.
+// Simula las respuestas del backend: el catálogo responde solo (GET /api/productos) y
+// cada otra llamada a fetch devuelve la siguiente respuesta indicada.
 function simularApi(...respuestas) {
-  const fetchFalso = vi.fn()
-  respuestas.forEach(({ cuerpo, estado = 200 }) => {
-    fetchFalso.mockResolvedValueOnce({
-      ok: estado >= 200 && estado < 300,
-      status: estado,
-      text: () => Promise.resolve(JSON.stringify(cuerpo)),
-    })
-  })
+  const fetchFalso = crearFetchFalso(respuestas)
   vi.stubGlobal('fetch', fetchFalso)
   return fetchFalso
+}
+
+// JWT de prueba (firma falsa): solo interesa el "exp" que lee el frontend.
+const tokenQueVence = (segundos) => {
+  const payload = btoa(JSON.stringify({ sub: '1', rol: 'CLIENTE', exp: Math.floor(Date.now() / 1000) + segundos }))
+  return `x.${payload}.y`
 }
 
 const sesionApi = (nombre, rol = 'CLIENTE') => ({
@@ -40,16 +41,49 @@ describe('App - autenticación', () => {
     vi.unstubAllGlobals()
   })
 
-  it.each(['/', '/catalogo', '/contacto', '/checkout', '/rastreo'])('sin sesión, %s manda primero a iniciar sesión, sin navbar', (ruta) => {
+  it.each(['/', '/catalogo', '/contacto'])('sin sesión, %s es pública: muestra el navbar con "Iniciar sesión"', (ruta) => {
+    renderEn(ruta, { conSesion: false })
+    expect(window.location.pathname).toBe(ruta)
+    expect(navbar()).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Iniciar sesión' })).toHaveAttribute('href', '/iniciar-sesion')
+  })
+
+  it.each(['/checkout', '/rastreo', '/admin'])('sin sesión, %s manda primero a iniciar sesión, sin navbar', (ruta) => {
     renderEn(ruta, { conSesion: false })
     expect(window.location.pathname).toBe('/iniciar-sesion')
     expect(screen.getByText('Ingresa con tu correo y contraseña')).toBeInTheDocument()
+    expect(screen.getByText('Inicia sesión para continuar.')).toBeInTheDocument()
     expect(screen.queryByRole('navigation', { name: 'Navegación principal' })).not.toBeInTheDocument()
+  })
+
+  it('después de iniciar sesión vuelve a la página privada que pidió', async () => {
+    simularApi(sesionApi('Camila Rojas'))
+    const user = renderEn('/rastreo', { conSesion: false })
+    await user.type(screen.getByLabelText(/Correo/), 'camila.rojas@correo.cl')
+    await user.type(screen.getByLabelText(/Contraseña/), 'Clave1234')
+    await user.click(screen.getByRole('button', { name: /Iniciar sesi[oó]n/ }))
+    expect(await screen.findByRole('heading', { level: 1, name: 'Rastrea tu pedido' })).toBeInTheDocument()
+  })
+
+  it('la sesión se mantiene al recargar la página (queda en localStorage)', () => {
+    iniciarSesion('Camila', { token: tokenQueVence(60), rol: 'CLIENTE' })
+    window.history.pushState({}, '', '/rastreo')
+    render(<App />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Rastrea tu pedido' })).toBeInTheDocument()
+    expect(screen.getByText('Camila')).toBeInTheDocument()
+  })
+
+  it('con el token vencido la sesión se limpia y vuelve al login', () => {
+    iniciarSesion('Camila', { token: tokenQueVence(-60), rol: 'CLIENTE' })
+    window.history.pushState({}, '', '/rastreo')
+    render(<App />)
+    expect(window.location.pathname).toBe('/iniciar-sesion')
+    expect(localStorage.getItem('gev:sesion')).toBeNull()
   })
 
   it('al ingresar llama al backend, entra al inicio y el navbar saluda con su primer nombre', async () => {
     const fetchFalso = simularApi(sesionApi('Camila Rojas'))
-    const user = renderEn('/', { conSesion: false })
+    const user = renderEn('/iniciar-sesion', { conSesion: false })
 
     await user.type(screen.getByLabelText(/Correo/), 'camila.rojas@correo.cl')
     await user.type(screen.getByLabelText(/Contraseña/), 'Clave1234')
@@ -63,7 +97,7 @@ describe('App - autenticación', () => {
 
   it('si el backend rechaza las credenciales muestra el error y no entra', async () => {
     simularApi({ estado: 401, cuerpo: { mensaje: 'Correo o contraseña incorrectos' } })
-    const user = renderEn('/', { conSesion: false })
+    const user = renderEn('/iniciar-sesion', { conSesion: false })
 
     await user.type(screen.getByLabelText(/Correo/), 'camila.rojas@correo.cl')
     await user.type(screen.getByLabelText(/Contraseña/), 'Clave1234')
@@ -77,7 +111,7 @@ describe('App - autenticación', () => {
     simularApi(sesionApi('Ana Admin', 'ADMINISTRADOR'), {
       cuerpo: { pedidosHoy: 3, pendientes: 1, enCurso: 1, entregadosHoy: 1, ventasHoy: 12000, umbralStockBajo: 15, stockBajo: [] },
     })
-    const user = renderEn('/', { conSesion: false })
+    const user = renderEn('/iniciar-sesion', { conSesion: false })
 
     await user.type(screen.getByLabelText(/Correo/), 'admin@elvolcan.cl')
     await user.type(screen.getByLabelText(/Contraseña/), 'Admin1234')
@@ -106,8 +140,10 @@ describe('App - autenticación', () => {
   it('cerrar sesión vuelve al login y ya no deja entrar', async () => {
     const user = renderEn('/')
 
-    await user.click(screen.getByRole('link', { name: 'Cerrar sesión' }))
+    await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }))
     expect(window.location.pathname).toBe('/iniciar-sesion')
+    expect(screen.getByText('Cerraste sesión correctamente.')).toBeInTheDocument()
+    expect(localStorage.getItem('gev:sesion')).toBeNull()
     expect(screen.queryByRole('navigation', { name: 'Navegación principal' })).not.toBeInTheDocument()
   })
 })
@@ -159,11 +195,19 @@ describe('App - panel de administración', () => {
     vi.unstubAllGlobals()
   })
 
-  it('un cliente que intenta entrar a /admin vuelve al inicio', () => {
+  it('un cliente que intenta entrar a /admin ve "Acceso restringido"', () => {
     iniciarSesion('Camila', { token: 't', rol: 'CLIENTE' })
     window.history.pushState({}, '', '/admin')
     render(<App />)
-    expect(window.location.pathname).toBe('/')
+    expect(screen.getByRole('heading', { level: 1, name: 'Acceso restringido' })).toBeInTheDocument()
+    expect(screen.queryByRole('navigation', { name: 'Secciones de administración' })).not.toBeInTheDocument()
+  })
+
+  it('un cliente no ve el enlace "Administración" en el navbar', () => {
+    iniciarSesion('Camila', { token: 't', rol: 'CLIENTE' })
+    window.history.pushState({}, '', '/')
+    render(<App />)
+    expect(within(navbar()).queryByRole('link', { name: 'Administración' })).not.toBeInTheDocument()
   })
 
   it('la operadora ve Resumen y Pedidos, pero no Usuarios ni Productos', () => {
@@ -184,6 +228,7 @@ describe('App - panel de administración', () => {
     iniciarSesion('Marta', { token: 't', rol: 'OPERADORA' })
     window.history.pushState({}, '', '/admin/usuarios')
     render(<App />)
-    expect(window.location.pathname).toBe('/admin')
+    expect(screen.getByRole('heading', { level: 1, name: 'Acceso restringido' })).toBeInTheDocument()
+    expect(screen.getByText(/Disponible solo para: Administrador/)).toBeInTheDocument()
   })
 })

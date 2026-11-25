@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { crearFetchFalso } from '../../test/apiFalsa.js'
 import App from '../../App.jsx'
 import { obtenerPedidoEnCurso } from '../../utils/pedidoEnCurso.js'
 import { iniciarSesion } from '../../utils/sesion.js'
@@ -26,6 +27,8 @@ async function completarDireccion(user) {
 async function pagarEnEfectivo(user) {
   await user.click(screen.getByRole('button', { name: /Efectivo contra entrega/ }))
   await user.click(screen.getByRole('button', { name: 'Confirmar y finalizar pedido' }))
+  // El pedido se registra en el backend (POST /api/pedidos) antes de mostrar la confirmación.
+  await screen.findByRole('heading', { level: 1, name: '¡Pedido confirmado!' })
 }
 
 describe('Checkout', () => {
@@ -82,6 +85,32 @@ describe('Checkout', () => {
 
     expect(JSON.parse(localStorage.getItem('gev:carrito'))).toEqual({})
     expect(within(navbar()).getByRole('link', { name: 'Ver carrito: vacío' })).toBeInTheDocument()
+  })
+
+  it('envía el pedido a POST /api/pedidos con la dirección, el pago y las líneas', async () => {
+    const user = renderEn('/checkout', { CL003: 1, RG001: 1 })
+    await completarDireccion(user)
+    await pagarEnEfectivo(user)
+
+    const [, opciones] = fetch.mock.calls.find(([url, o]) => url === '/api/pedidos' && o.method === 'POST')
+    expect(JSON.parse(opciones.body)).toMatchObject({
+      calle: 'Av. Libertad 1234',
+      telefono: '912345678',
+      comuna: 'Chillán',
+      metodoPago: 'EFECTIVO',
+      lineas: [{ codigo: 'CL003', cantidad: 1 }, { codigo: 'RG001', cantidad: 1 }],
+    })
+  })
+
+  it('si el backend rechaza el pedido muestra el error y no vacía el carrito', async () => {
+    const user = renderEn('/checkout', { CL002: 1 })
+    vi.stubGlobal('fetch', crearFetchFalso([{ estado: 409, cuerpo: { mensaje: 'Stock insuficiente para Cilindro GLP 11 kg' } }]))
+    await completarDireccion(user)
+    await user.click(screen.getByRole('button', { name: /Efectivo contra entrega/ }))
+    await user.click(screen.getByRole('button', { name: 'Confirmar y finalizar pedido' }))
+
+    expect(await screen.findByText(/Stock insuficiente/)).toBeInTheDocument()
+    expect(JSON.parse(localStorage.getItem('gev:carrito'))).toEqual({ CL002: 1 })
   })
 
   it('después de confirmar, "Rastrear pedido" muestra el mismo pedido', async () => {

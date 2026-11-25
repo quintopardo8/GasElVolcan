@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { validarCorreo, validarContrasena } from "./validadores";
 import { esPersonal, guardarSesionDesdeApi } from "../../utils/sesion.js";
 import { auth } from "../../utils/api.js";
@@ -10,6 +10,15 @@ import "./IniciarSesion.css";
 
 export default function IniciarSesion() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Por qué llegó al login: venció el token, cerró sesión o intentó entrar a una página privada.
+  const motivo = location.state?.motivo || (new URLSearchParams(location.search).has("expirada") ? "expirada" : undefined);
+  const desde = location.state?.desde;
+  const AVISOS = {
+    expirada: "Tu sesión expiró. Vuelve a iniciar sesión para continuar.",
+    cerrada: "Cerraste sesión correctamente.",
+  };
+  const aviso = AVISOS[motivo] || (desde ? "Inicia sesión para continuar." : "");
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errores, setErrores] = useState({ correo: "", contrasena: "" });
@@ -47,7 +56,9 @@ export default function IniciarSesion() {
       const respuesta = await auth.login(correo.trim(), contrasena);
       guardarSesionDesdeApi(respuesta);
       // Administradora y operadora entran directo al panel de administración.
-      navigate(esPersonal(respuesta.usuario.rol) ? "/admin" : "/", { replace: true });
+      // Si venía de una página privada (p. ej. /checkout) vuelve a ella.
+      const destino = desde || (esPersonal(respuesta.usuario.rol) ? "/admin" : "/");
+      navigate(destino, { replace: true });
     } catch (error) {
       setErrorServidor(error.message);
       setEnviando(false);
@@ -60,6 +71,9 @@ export default function IniciarSesion() {
 
         <br />
       <h3 className="texto-gris">Ingresa con tu correo y contraseña</h3>
+      {aviso && (
+        <p className={`aviso-sesion ${motivo === "expirada" ? "aviso-alerta" : ""}`} role="status">{aviso}</p>
+      )}
       <br />
 
       <CampoSesion id="inputCorreo" etiqueta="Correo*" type="email"

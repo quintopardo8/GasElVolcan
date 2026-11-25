@@ -46,7 +46,11 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Todo el servicio exige token; no hay rutas públicas.
+                        // Documentación Swagger / OpenAPI: pública para poder leerla; los endpoints igual exigen token.
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Catálogo público: la tienda muestra productos y categorías sin iniciar sesión.
+                        .requestMatchers(HttpMethod.GET, "/api/productos", "/api/productos/*", "/api/categorias").permitAll()
+                        // Todo lo demás exige token (crear/editar/eliminar, pedidos y reportes).
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())

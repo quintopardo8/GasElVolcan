@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CarritoContext } from './CarritoContext.js';
 import { buscarProducto } from '../data/catalogo.js';
+import { useCatalogo } from './CatalogoContext.js';
 
 // Se guarda solo { codigo: cantidad }; nombre y precio se leen siempre del catálogo.
 const CLAVE = 'gev:carrito';
@@ -16,6 +17,8 @@ function leerGuardado() {
 
 export default function CarritoProvider({ children }) {
   const [cantidades, setCantidades] = useState(leerGuardado);
+  // Cuando llega (o se recarga) el catálogo desde la API se recalculan nombres, precios y stock.
+  const { productos } = useCatalogo();
 
   useEffect(() => {
     try {
@@ -60,7 +63,7 @@ export default function CarritoProvider({ children }) {
       quitar: (codigo) => cambiar(codigo, () => 0),
       vaciar: () => setCantidades({}),
     };
-  }, [cantidades]);
+  }, [cantidades, productos]);
 
   return <CarritoContext.Provider value={valor}>{children}</CarritoContext.Provider>;
 }
