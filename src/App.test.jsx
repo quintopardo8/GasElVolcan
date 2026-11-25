@@ -79,6 +79,7 @@ describe('App - autenticación', () => {
     render(<App />)
     expect(window.location.pathname).toBe('/iniciar-sesion')
     expect(localStorage.getItem('gev:sesion')).toBeNull()
+    expect(screen.getByText('Tu sesión expiró. Vuelve a iniciar sesión para continuar.')).toBeInTheDocument()
   })
 
   it('al ingresar llama al backend, entra al inicio y el navbar saluda con su primer nombre', async () => {

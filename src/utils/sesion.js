@@ -1,6 +1,7 @@
 // Sesión del usuario guardada en el navegador.
 // Con el backend guarda también el token JWT y el rol que devuelve /api/auth/login.
 const CLAVE = 'gev:sesion'
+const CLAVE_EXPIRADA = 'gev:sesionExpirada'
 
 // Roles que pueden entrar al panel de administración.
 export const ROLES_PERSONAL = ['ADMINISTRADOR', 'OPERADORA']
@@ -18,6 +19,8 @@ export function obtenerSesion() {
     if (!sesion || !sesion.nombre) return null
     if (sesion.token && tokenVencido(sesion.token)) {
       localStorage.removeItem(CLAVE)
+      // Para que el login explique por qué se pidió de nuevo la contraseña.
+      sessionStorage.setItem(CLAVE_EXPIRADA, '1')
       return null
     }
     return sesion
@@ -58,6 +61,23 @@ function obtenerTokenCrudo() {
     return JSON.parse(localStorage.getItem(CLAVE))?.token || null
   } catch {
     return null
+  }
+}
+
+/** true si la última sesión se descartó porque venció el token (el login lo avisa). */
+export function avisoExpiradaPendiente() {
+  try {
+    return sessionStorage.getItem(CLAVE_EXPIRADA) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function limpiarAvisoExpirada() {
+  try {
+    sessionStorage.removeItem(CLAVE_EXPIRADA)
+  } catch {
+    // Nada que limpiar.
   }
 }
 

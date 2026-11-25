@@ -16,7 +16,11 @@ export default function CatalogoProvider({ children }) {
     setCargando(true);
     setError('');
     try {
-      const lista = await productosApi.listar();
+      // La API los entrega ordenados por código; en la tienda se agrupan por categoría
+      // (cilindros primero) y dentro de cada una por código.
+      const lista = [...(await productosApi.listar())].sort(
+        (a, b) => (a.categoriaId ?? 0) - (b.categoriaId ?? 0) || a.codigo.localeCompare(b.codigo),
+      );
       registrarProductos(lista);
       setProductos(lista);
     } catch (e) {

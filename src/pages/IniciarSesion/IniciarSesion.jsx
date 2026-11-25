@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { validarCorreo, validarContrasena } from "./validadores";
-import { esPersonal, guardarSesionDesdeApi } from "../../utils/sesion.js";
+import { avisoExpiradaPendiente, esPersonal, limpiarAvisoExpirada, guardarSesionDesdeApi } from "../../utils/sesion.js";
 import { auth } from "../../utils/api.js";
 import TarjetaSesion from "./components/TarjetaSesion.jsx";
 import CampoSesion from "./components/CampoSesion.jsx";
@@ -12,7 +12,12 @@ export default function IniciarSesion() {
   const navigate = useNavigate();
   const location = useLocation();
   // Por qué llegó al login: venció el token, cerró sesión o intentó entrar a una página privada.
-  const motivo = location.state?.motivo || (new URLSearchParams(location.search).has("expirada") ? "expirada" : undefined);
+  const [expiroAlCargar] = useState(avisoExpiradaPendiente);
+  useEffect(() => {
+    limpiarAvisoExpirada();
+  }, []);
+  const motivo = location.state?.motivo
+    || (expiroAlCargar || new URLSearchParams(location.search).has("expirada") ? "expirada" : undefined);
   const desde = location.state?.desde;
   const AVISOS = {
     expirada: "Tu sesión expiró. Vuelve a iniciar sesión para continuar.",

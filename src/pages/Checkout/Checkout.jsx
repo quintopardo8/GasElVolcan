@@ -12,7 +12,8 @@ import { esPersonal, obtenerSesion } from '../../utils/sesion.js';
 import { useCatalogo } from '../../context/CatalogoContext.js';
 
 function horaActual() {
-  return new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+  // Siempre "HH:MM" en 24 h: el rastreo calcula la hora estimada a partir de este texto.
+  return new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 export default function Checkout() {
