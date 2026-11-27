@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -24,26 +24,54 @@ const COORDENADAS_COMUNA = {
 
 const iconoPin = L.divIcon({
   className: 'volcan-leaflet-pin',
-  html: '<div style="font-size:28px;line-height:1;transform:translate(-50%,-85%);">📍</div>',
+  html: '<div style="font-size:28px;line-height:1;transform:translate(-50%,-85%);cursor:grab;">📍</div>',
   iconSize: [28, 28],
   iconAnchor: [14, 28]
 });
 
-function MapaDireccion({ comuna, coords, onCambiarCoords }) {
+async function reverseGeocode(lat, lng) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&addressdetails=1`,
+      {
+        headers: {
+          'Accept-Language': 'es'
+        }
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const addr = data?.address || {};
+    const road = addr.road || addr.pedestrian || addr.residential || '';
+    const houseNumber = addr.house_number || '';
+    const calleNumero = [road, houseNumber].filter(Boolean).join(' ').trim();
+    return {
+      calleNumero,
+      displayName: data?.display_name || ''
+    };
+  } catch {
+    return null;
+  }
+}
+
+function MapaDireccion({ comuna, coords, origenCambio, onSeleccionMapa }) {
   const contenedorRef = useRef(null);
   const mapaRef = useRef(null);
   const marcadorRef = useRef(null);
-  const onCambiarCoordsRef = useRef(onCambiarCoords);
+  const onSeleccionMapaRef = useRef(onSeleccionMapa);
 
   useEffect(() => {
-    onCambiarCoordsRef.current = onCambiarCoords;
-  }, [onCambiarCoords]);
+    onSeleccionMapaRef.current = onSeleccionMapa;
+  }, [onSeleccionMapa]);
 
   useEffect(() => {
     if (!contenedorRef.current || mapaRef.current) return;
 
     const inicial = coords || COORDENADAS_COMUNA[comuna] || COORDENADAS_COMUNA['Chillán'];
-    const map = L.map(contenedorRef.current).setView(inicial, 14);
+    const map = L.map(contenedorRef.current, {
+      center: inicial,
+      zoom: 15
+    });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
@@ -54,16 +82,25 @@ function MapaDireccion({ comuna, coords, onCambiarCoords }) {
       draggable: true
     }).addTo(map);
 
+    const emitirUbicacion = async (lat, lng) => {
+      const geo = await reverseGeocode(lat, lng);
+      onSeleccionMapaRef.current([lat, lng], geo?.calleNumero || '');
+    };
+
     marker.on('dragend', () => {
       const { lat, lng } = marker.getLatLng();
-      onCambiarCoordsRef.current([lat, lng]);
+      emitirUbicacion(lat, lng);
     });
 
     map.on('click', (e) => {
       const { lat, lng } = e.latlng;
       marker.setLatLng([lat, lng]);
-      onCambiarCoordsRef.current([lat, lng]);
+      emitirUbicacion(lat, lng);
     });
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
 
     mapaRef.current = map;
     marcadorRef.current = marker;
@@ -76,18 +113,20 @@ function MapaDireccion({ comuna, coords, onCambiarCoords }) {
   }, []);
 
   useEffect(() => {
-    const objetivo = coords || COORDENADAS_COMUNA[comuna] || COORDENADAS_COMUNA['Chillán'];
-    if (mapaRef.current && marcadorRef.current) {
-      mapaRef.current.setView(objetivo, 14);
-      marcadorRef.current.setLatLng(objetivo);
+    if (!mapaRef.current || !marcadorRef.current || !coords) return;
+    marcadorRef.current.setLatLng(coords);
+
+    // Solo recentra y ajusta zoom cuando cambia la comuna desde el selector
+    if (origenCambio === 'comuna') {
+      mapaRef.current.setView(coords, 14);
     }
-  }, [comuna, coords]);
+  }, [coords, origenCambio]);
 
   return (
     <div
       ref={contenedorRef}
       className="rounded-3 border overflow-hidden"
-      style={{ height: '260px', width: '100%' }}
+      style={{ height: '280px', width: '100%', zIndex: 1 }}
     />
   );
 }
@@ -105,12 +144,15 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
     coords: datosPrevios.coords || COORDENADAS_COMUNA[comunaInicial] || COORDENADAS_COMUNA['Chillán']
   });
 
+  const [origenCambio, setOrigenCambio] = useState('inicial');
+  const [buscandoDireccion, setBuscandoDireccion] = useState(false);
   const [errores, setErrores] = useState({});
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
       if (name === 'comuna') {
+        setOrigenCambio('comuna');
         return {
           ...prev,
           comuna: value,
@@ -129,9 +171,18 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
     setFormData((prev) => ({ ...prev, slot: id }));
   };
 
-  const manejarCambiarCoords = (nuevasCoords) => {
-    setFormData((prev) => ({ ...prev, coords: nuevasCoords }));
-  };
+  const manejarSeleccionMapa = useCallback((nuevasCoords, calleDetectada) => {
+    setOrigenCambio('mapa');
+    setBuscandoDireccion(false);
+    setFormData((prev) => ({
+      ...prev,
+      coords: nuevasCoords,
+      street: calleDetectada ? calleDetectada : prev.street
+    }));
+    if (calleDetectada) {
+      setErrores((prev) => ({ ...prev, street: null }));
+    }
+  }, []);
 
   const manejarEnvio = (e) => {
     e.preventDefault();
@@ -276,12 +327,15 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
             <MapaDireccion
               comuna={formData.comuna}
               coords={formData.coords}
-              onCambiarCoords={manejarCambiarCoords}
+              origenCambio={origenCambio}
+              onSeleccionMapa={manejarSeleccionMapa}
             />
             <div className="form-text mt-2">
-              {formData.street.trim()
-                ? `${formData.street}, ${formData.comuna}`
-                : `Centrado en ${formData.comuna}`}
+              {buscandoDireccion
+                ? 'Buscando dirección...'
+                : formData.street.trim()
+                  ? `${formData.street}, ${formData.comuna} (${formData.coords[0].toFixed(5)}, ${formData.coords[1].toFixed(5)})`
+                  : `Centrado en ${formData.comuna} (${formData.coords[0].toFixed(5)}, ${formData.coords[1].toFixed(5)})`}
             </div>
           </div>
         </div>
