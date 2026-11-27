@@ -1,6 +1,8 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { crearFetchFalso } from '../../test/apiFalsa.js'
+import { cerrarSesion, iniciarSesion } from '../../utils/sesion.js'
 import { guardarPedidoEnCurso, limpiarPedidoEnCurso } from '../../utils/pedidoEnCurso.js'
 import Rastreo from './Rastreo.jsx'
 
@@ -27,6 +29,7 @@ const pasos = () => within(screen.getByRole('list', { name: 'Estado del pedido' 
 describe('Rastreo', () => {
   afterEach(() => {
     limpiarPedidoEnCurso()
+    cerrarSesion()
   })
 
   it('muestra el título, la descripción y el título de la pestaña', () => {
@@ -66,11 +69,12 @@ describe('Rastreo', () => {
     expect(lista[3]).not.toHaveAttribute('class')
   })
 
-  it('un pedido recién confirmado no muestra el mapa y respeta el horario elegido', () => {
+  it('un pedido recién confirmado muestra el camión en la distribuidora y respeta el horario elegido', () => {
     renderRastreo({ ...PEDIDO, estado: 'confirmado', direccion: { ...PEDIDO.direccion, slot: 'pm' } })
     expect(screen.getByRole('heading', { level: 2, name: '¡Recibimos tu pedido!' })).toBeInTheDocument()
     expect(screen.getByText(/Llegará/)).toHaveTextContent('Llegará durante la tarde.')
-    expect(screen.queryByLabelText('Ubicación estimada de tu pedido')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Ubicación estimada de tu pedido')).toBeInTheDocument()
+    expect(screen.getByText('Tu pedido está en la distribuidora')).toBeInTheDocument()
     expect(pasos()[0]).toHaveClass('active')
     expect(pasos()[1]).not.toHaveAttribute('class')
   })
@@ -82,5 +86,26 @@ describe('Rastreo', () => {
     expect(detalle).toHaveTextContent('2 × Regulador doméstico estándar')
     expect(detalle).toHaveTextContent('Total $33.980 · Pago al recibir en efectivo')
     expect(detalle).toHaveTextContent('Entrega en Av. Libertad 1234 (Depto 5), Chillán')
+  })
+
+  it('consulta el estado al backend y actualiza el seguimiento y el mapa', async () => {
+    iniciarSesion('Camila', { token: 't', rol: 'CLIENTE' })
+    vi.stubGlobal('fetch', crearFetchFalso([{ cuerpo: { id: 42, codigo: 'EV-00042', estado: 'EN_CAMINO' } }]))
+    renderRastreo({ ...PEDIDO, estado: 'confirmado', idApi: 42 })
+
+    expect(await screen.findByRole('heading', { level: 2, name: '¡Tu pedido está en camino!' })).toBeInTheDocument()
+    expect(fetch).toHaveBeenCalledWith('/api/pedidos/42', expect.objectContaining({ method: 'GET' }))
+    expect(screen.getByText(/El repartidor se encuentra a \d+ minutos? de tu dirección/)).toBeInTheDocument()
+    // El estado nuevo queda guardado para el inicio.
+    expect(JSON.parse(localStorage.getItem('gev:pedidoEnCurso')).estado).toBe('en-camino')
+  })
+
+  it('un pedido cancelado en el panel muestra el aviso y oculta el mapa', async () => {
+    iniciarSesion('Camila', { token: 't', rol: 'CLIENTE' })
+    vi.stubGlobal('fetch', crearFetchFalso([{ cuerpo: { id: 42, estado: 'CANCELADO' } }]))
+    renderRastreo({ ...PEDIDO, estado: 'confirmado', idApi: 42 })
+
+    expect(await screen.findByText(/Este pedido fue cancelado/)).toBeInTheDocument()
+    expect(screen.queryByLabelText('Ubicación estimada de tu pedido')).not.toBeInTheDocument()
   })
 })

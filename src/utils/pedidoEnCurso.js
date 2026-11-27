@@ -25,6 +25,25 @@ export function guardarPedidoEnCurso(pedido) {
   }
 }
 
+// Estado del backend (pedidos-service) → paso que muestra el seguimiento.
+export const ESTADO_DESDE_API = {
+  PENDIENTE: 'confirmado',
+  ASIGNADO: 'preparado',
+  EN_CAMINO: 'en-camino',
+  ENTREGADO: 'entregado',
+  CANCELADO: 'cancelado',
+}
+
+/** Cambia el estado del pedido guardado (y otros datos sueltos) sin tocar sus líneas. */
+export function actualizarPedidoEnCurso(cambios) {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(CLAVE))
+    if (guardado) localStorage.setItem(CLAVE, JSON.stringify({ ...guardado, ...cambios }))
+  } catch {
+    // Sin almacenamiento: el cambio solo se ve mientras la página siga abierta.
+  }
+}
+
 export function limpiarPedidoEnCurso() {
   try {
     localStorage.removeItem(CLAVE)

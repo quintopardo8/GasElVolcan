@@ -1,0 +1,435 @@
+/* ---------- Panel de administración ---------- */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: var(--volcan-bg);
+  color: #1e293b;
+}
+
+/* Menú lateral */
+.admin-sidebar {
+  width: 248px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 14px;
+  background: var(--volcan-navy);
+  color: #fff;
+  overflow-y: auto;
+}
+
+.admin-marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+}
+
+.admin-marca-logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.admin-marca-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.admin-marca strong {
+  display: block;
+  font-size: 15px;
+}
+
+.admin-marca small {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.admin-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.admin-nav a.active {
+  background: var(--volcan-blue);
+  color: #fff;
+}
+
+.admin-nav a:focus-visible,
+.admin-salir:focus-visible,
+.admin-enlace-tienda:focus-visible,
+.admin-hamburguesa:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.admin-usuario {
+  margin-top: auto;
+  padding: 14px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+}
+
+.admin-usuario-nombre {
+  font-weight: 700;
+}
+
+.admin-usuario-rol {
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 10px;
+}
+
+.admin-enlace-tienda {
+  display: block;
+  color: #bfdbfe;
+  margin-bottom: 8px;
+}
+
+.admin-salir {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-salir:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Contenido */
+.admin-principal {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-contenido {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 32px);
+}
+
+.admin-barra-movil {
+  display: none;
+}
+
+.admin-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.admin-encabezado h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  color: var(--volcan-navy);
+  margin: 0;
+}
+
+.admin-descripcion {
+  color: var(--volcan-muted);
+  margin: 4px 0 0;
+}
+
+.admin-encabezado-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-tarjeta {
+  background: #fff;
+  border: 1px solid var(--volcan-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.admin-tarjeta > h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--volcan-navy);
+  margin-bottom: 12px;
+}
+
+.admin-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.admin-filtros > div {
+  min-width: 160px;
+  flex: 1 1 160px;
+  max-width: 260px;
+}
+
+.admin-filtros .form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--volcan-muted);
+  margin-bottom: 4px;
+}
+
+/* Tablas */
+.admin-tabla {
+  margin: 0;
+  font-size: 14px;
+}
+
+.admin-tabla th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--volcan-muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-tabla td {
+  vertical-align: middle;
+}
+
+.admin-tabla .acciones {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.admin-tabla .acciones .btn + .btn {
+  margin-left: 6px;
+}
+
+.admin-tabla .fila-inactiva td {
+  color: #94a3b8;
+}
+
+.admin-tabla .select-compacto {
+  min-width: 150px;
+}
+
+.admin-muted {
+  color: var(--volcan-muted);
+  font-size: 13px;
+}
+
+.admin-cargando {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 4px;
+  color: var(--volcan-muted);
+}
+
+.admin-vacio {
+  padding: 24px 4px;
+  margin: 0;
+  color: var(--volcan-muted);
+  text-align: center;
+}
+
+/* Tarjetas de indicadores (resumen) */
+.admin-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.admin-kpi {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--volcan-border);
+  border-radius: 12px;
+  padding: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+a.admin-kpi:hover {
+  border-color: var(--volcan-blue);
+}
+
+.admin-kpi-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--volcan-muted);
+}
+
+.admin-kpi-valor {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--volcan-navy);
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.admin-kpi-nota {
+  font-size: 12px;
+  color: var(--volcan-muted);
+  margin-top: 4px;
+}
+
+.admin-kpi.destacado {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+/* Líneas del formulario de pedido */
+.admin-lineas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-linea {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.admin-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 17px;
+  border-top: 1px solid var(--volcan-border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.admin-stock {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.admin-stock input {
+  width: 84px;
+}
+
+/* Bootstrap: botón principal con el azul de la marca */
+.admin-layout .btn-primary,
+.modal .btn-primary {
+  --bs-btn-bg: var(--volcan-blue);
+  --bs-btn-border-color: var(--volcan-blue);
+  --bs-btn-hover-bg: var(--volcan-blue-hover);
+  --bs-btn-hover-border-color: var(--volcan-blue-hover);
+  --bs-btn-active-bg: var(--volcan-blue-hover);
+  --bs-btn-disabled-bg: var(--volcan-blue);
+  --bs-btn-disabled-border-color: var(--volcan-blue);
+}
+
+/* ---------- Tableta y teléfono: menú tipo hamburguesa ---------- */
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1045;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .admin-sidebar.abierto {
+    transform: none;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .admin-velo {
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    background: rgba(15, 23, 42, 0.45);
+  }
+
+  .admin-barra-movil {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    padding: 10px 16px;
+    background: var(--volcan-navy);
+    color: #fff;
+  }
+
+  .admin-hamburguesa {
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .admin-barra-titulo {
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .admin-filtros > div {
+    max-width: none;
+  }
+
+  .admin-encabezado-acciones,
+  .admin-encabezado-acciones .btn {
+    width: 100%;
+  }
+
+  .admin-linea {
+    grid-template-columns: 1fr 72px auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar {
+    transition: none;
+  }
+}

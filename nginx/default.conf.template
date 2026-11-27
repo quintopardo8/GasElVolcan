@@ -1,0 +1,39 @@
+# Plantilla de nginx: al arrancar el contenedor, la imagen oficial reemplaza
+# ${USUARIOS_API} y ${PEDIDOS_API} con las variables de entorno y la copia a conf.d/.
+# Así la misma imagen sirve en local (host.docker.internal) y en AWS (IP privada del backend).
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # usuarios-service: login, registro y CRUD de usuarios
+    location ~ ^/api/(auth|usuarios)(/|$) {
+        proxy_pass ${USUARIOS_API};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Authorization $http_authorization;
+    }
+
+    # pedidos-service: productos, categorías, pedidos y reportes
+    location /api/ {
+        proxy_pass ${PEDIDOS_API};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Authorization $http_authorization;
+    }
+
+    # Archivos con hash en el nombre: se pueden guardar en caché por mucho tiempo.
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # SPA: cualquier otra ruta (/admin, /catalogo...) la resuelve React Router.
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+}

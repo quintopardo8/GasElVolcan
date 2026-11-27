@@ -151,3 +151,20 @@
     display: none;
   }
 }
+
+/* Botón de salir (antes era un enlace) y botón de ingresar para visitantes */
+.boton-salir {
+  cursor: pointer;
+}
+.boton-ingresar {
+  display: inline-flex;
+  align-items: center;
+  padding: .45rem 1.1rem;
+  border-radius: 999px;
+  background: var(--volcan-blue);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.boton-ingresar:hover { background: var(--volcan-blue-hover); color: #fff; }
