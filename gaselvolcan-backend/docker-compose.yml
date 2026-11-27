@@ -1,0 +1,73 @@
+# Backend de Gas El Volcán: PostgreSQL + 2 microservicios Spring Boot.
+#   docker compose up -d --build
+#   usuarios-service → http://localhost:8081  (Swagger: /swagger-ui.html)
+#   pedidos-service  → http://localhost:8082  (Swagger: /swagger-ui.html)
+#   PostgreSQL       → 127.0.0.1:5433 (solo desde la misma máquina)
+# Los valores ${...} se cambian en un archivo .env (ver .env.example).
+name: gas-el-volcan-backend
+
+x-entorno-comun: &entorno-comun
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_USER: volcan
+  DB_PASSWORD: ${DB_PASSWORD:-volcan123}
+  JWT_SECRET: ${JWT_SECRET:-desarrollo-cambia-este-secreto-por-uno-largo-y-aleatorio}
+  # Orígenes del navegador que pueden llamar directo a la API (el frontend por nginx no lo necesita).
+  CORS_ORIGENES: ${CORS_ORIGENES:-http://localhost:5173,http://localhost:8080}
+  # Memoria de cada JVM: deja espacio a PostgreSQL en instancias pequeñas (t3.micro/t3.small).
+  JAVA_TOOL_OPTIONS: ${JAVA_OPTS:--Xms128m -Xmx384m}
+  TZ: America/Santiago
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: volcan
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-volcan123}
+      # Base del primer microservicio; la segunda (gas_pedidos) la crea postgres/init.sql.
+      POSTGRES_DB: gas_usuarios
+      TZ: America/Santiago
+    ports:
+      # Publicado solo en 127.0.0.1: la base de datos NUNCA queda expuesta a internet.
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U volcan -d gas_pedidos"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  usuarios-service:
+    build: ./usuarios-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *entorno-comun
+      DB_NAME: gas_usuarios
+      JWT_MINUTOS: ${JWT_MINUTOS:-480}
+      ADMIN_CORREO: ${ADMIN_CORREO:-admin@elvolcan.cl}
+      ADMIN_CONTRASENA: ${ADMIN_CONTRASENA:-Admin1234}
+      DATOS_DEMO: ${DATOS_DEMO:-true}
+    ports:
+      - "8081:8081"
+
+  pedidos-service:
+    build: ./pedidos-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *entorno-comun
+      DB_NAME: gas_pedidos
+    ports:
+      - "8082:8082"
+
+volumes:
+  postgres_data:

@@ -1,19 +1,92 @@
-# Frontend de Gas El Volcán (React compilado + nginx).
-#   docker compose up -d --build   → http://localhost:8080
-# nginx reenvía /api/... al backend (repositorio gaselvolcan-backend).
-# Local: el backend corre en la misma PC → host.docker.internal.
-# AWS:   en .env pon la IP PRIVADA de la EC2 del backend (ver .env.example).
-name: gas-el-volcan-frontend
+# Gas El Volcán · sistema completo (frontend + backend) desde la carpeta raíz.
+#
+#   docker compose up -d --build
+#
+#   Tienda y panel admin    → http://localhost:8080
+#   usuarios-service (API)  → http://localhost:8081  (Swagger: /swagger-ui.html)
+#   pedidos-service  (API)  → http://localhost:8082  (Swagger: /swagger-ui.html)
+#   PostgreSQL              → 127.0.0.1:5433 (usuario volcan)
+#
+# Construye 3 imágenes: frontend (React + nginx), usuarios-service y pedidos-service.
+# Los valores ${...} se cambian en un archivo .env junto a este (ver .env.example).
+# No lo levantes al mismo tiempo que los docker-compose de cada carpeta: usan los mismos puertos.
+name: gas-el-volcan
+
+x-entorno-comun: &entorno-comun
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_USER: volcan
+  DB_PASSWORD: ${DB_PASSWORD:-volcan123}
+  JWT_SECRET: ${JWT_SECRET:-desarrollo-cambia-este-secreto-por-uno-largo-y-aleatorio}
+  CORS_ORIGENES: ${CORS_ORIGENES:-http://localhost:5173,http://localhost:8080}
+  JAVA_TOOL_OPTIONS: ${JAVA_OPTS:--Xms128m -Xmx384m}
+  TZ: America/Santiago
 
 services:
-  frontend:
-    build: .
+  postgres:
+    image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      USUARIOS_API: ${USUARIOS_API:-http://host.docker.internal:8081}
-      PEDIDOS_API: ${PEDIDOS_API:-http://host.docker.internal:8082}
-    extra_hosts:
-      # En Linux (EC2) host.docker.internal no existe por defecto.
-      - "host.docker.internal:host-gateway"
+      POSTGRES_USER: volcan
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-volcan123}
+      # Base del primer microservicio; la segunda (gas_pedidos) la crea init.sql.
+      POSTGRES_DB: gas_usuarios
+      TZ: America/Santiago
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./gaselvolcan-backend/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U volcan -d gas_pedidos"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  usuarios-service:
+    build: ./gaselvolcan-backend/usuarios-service
+    image: gaselvolcan/usuarios-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *entorno-comun
+      DB_NAME: gas_usuarios
+      JWT_MINUTOS: ${JWT_MINUTOS:-480}
+      ADMIN_CORREO: ${ADMIN_CORREO:-admin@elvolcan.cl}
+      ADMIN_CONTRASENA: ${ADMIN_CONTRASENA:-Admin1234}
+      DATOS_DEMO: ${DATOS_DEMO:-true}
+    ports:
+      - "8081:8081"
+
+  pedidos-service:
+    build: ./gaselvolcan-backend/pedidos-service
+    image: gaselvolcan/pedidos-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *entorno-comun
+      DB_NAME: gas_pedidos
+    ports:
+      - "8082:8082"
+
+  frontend:
+    build: ./gaselvolcan-frontend
+    image: gaselvolcan/frontend
+    restart: unless-stopped
+    depends_on:
+      - usuarios-service
+      - pedidos-service
+    environment:
+      # Dentro de esta red de Docker, nginx llega a cada microservicio por su nombre.
+      USUARIOS_API: http://usuarios-service:8081
+      PEDIDOS_API: http://pedidos-service:8082
     ports:
       - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  postgres_data:
