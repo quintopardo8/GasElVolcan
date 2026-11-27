@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
   validarCalleNumero,
   validarComuna,
@@ -11,21 +13,113 @@ const HORARIOS = [
   { id: 'pm', label: 'Durante la tarde' }
 ];
 
+const COORDENADAS_COMUNA = {
+  'Chillán': [-36.6066, -72.1034],
+  'Chillán Viejo': [-36.6236, -72.1333],
+  'Coihueco': [-36.6256, -71.8322],
+  'Pinto': [-36.6975, -71.8958],
+  'Bulnes': [-36.7436, -72.2994],
+  'San Carlos': [-36.4258, -71.9589]
+};
+
+const iconoPin = L.divIcon({
+  className: 'volcan-leaflet-pin',
+  html: '<div style="font-size:28px;line-height:1;transform:translate(-50%,-85%);">📍</div>',
+  iconSize: [28, 28],
+  iconAnchor: [14, 28]
+});
+
+function MapaDireccion({ comuna, coords, onCambiarCoords }) {
+  const contenedorRef = useRef(null);
+  const mapaRef = useRef(null);
+  const marcadorRef = useRef(null);
+  const onCambiarCoordsRef = useRef(onCambiarCoords);
+
+  useEffect(() => {
+    onCambiarCoordsRef.current = onCambiarCoords;
+  }, [onCambiarCoords]);
+
+  useEffect(() => {
+    if (!contenedorRef.current || mapaRef.current) return;
+
+    const inicial = coords || COORDENADAS_COMUNA[comuna] || COORDENADAS_COMUNA['Chillán'];
+    const map = L.map(contenedorRef.current).setView(inicial, 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const marker = L.marker(inicial, {
+      icon: iconoPin,
+      draggable: true
+    }).addTo(map);
+
+    marker.on('dragend', () => {
+      const { lat, lng } = marker.getLatLng();
+      onCambiarCoordsRef.current([lat, lng]);
+    });
+
+    map.on('click', (e) => {
+      const { lat, lng } = e.latlng;
+      marker.setLatLng([lat, lng]);
+      onCambiarCoordsRef.current([lat, lng]);
+    });
+
+    mapaRef.current = map;
+    marcadorRef.current = marker;
+
+    return () => {
+      map.remove();
+      mapaRef.current = null;
+      marcadorRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const objetivo = coords || COORDENADAS_COMUNA[comuna] || COORDENADAS_COMUNA['Chillán'];
+    if (mapaRef.current && marcadorRef.current) {
+      mapaRef.current.setView(objetivo, 14);
+      marcadorRef.current.setLatLng(objetivo);
+    }
+  }, [comuna, coords]);
+
+  return (
+    <div
+      ref={contenedorRef}
+      className="rounded-3 border overflow-hidden"
+      style={{ height: '260px', width: '100%' }}
+    />
+  );
+}
+
 export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVolver }) {
+  const comunaInicial = datosPrevios.comuna || 'Chillán';
+
   const [formData, setFormData] = useState({
     street: datosPrevios.street || '',
     unit: datosPrevios.unit || '',
-    comuna: datosPrevios.comuna || 'Chillán',
+    comuna: comunaInicial,
     phone: datosPrevios.phone || '',
     refs: datosPrevios.refs || '',
-    slot: datosPrevios.slot || 'asap'
+    slot: datosPrevios.slot || 'asap',
+    coords: datosPrevios.coords || COORDENADAS_COMUNA[comunaInicial] || COORDENADAS_COMUNA['Chillán']
   });
 
   const [errores, setErrores] = useState({});
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      if (name === 'comuna') {
+        return {
+          ...prev,
+          comuna: value,
+          coords: COORDENADAS_COMUNA[value] || prev.coords
+        };
+      }
+      return { ...prev, [name]: value };
+    });
+
     if (errores[name]) {
       setErrores((prev) => ({ ...prev, [name]: null }));
     }
@@ -33,6 +127,10 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
 
   const seleccionarHorario = (id) => {
     setFormData((prev) => ({ ...prev, slot: id }));
+  };
+
+  const manejarCambiarCoords = (nuevasCoords) => {
+    setFormData((prev) => ({ ...prev, coords: nuevasCoords }));
   };
 
   const manejarEnvio = (e) => {
@@ -171,14 +269,19 @@ export default function CheckoutDireccion({ datosPrevios = {}, onContinuar, onVo
           </div>
 
           <div className="col-12 mt-4">
-            <div className="mapa-simulado position-relative p-4 rounded-3 border bg-light text-center">
-              <div className="mapa-pin fs-2">📍</div>
-              <div className="position-absolute bottom-0 start-0 m-3 bg-white px-3 py-2 rounded shadow-sm small fw-semibold text-dark">
-                Escribe tu dirección para ubicarla en el mapa
-              </div>
-              <div className="position-absolute bottom-0 end-0 m-3 bg-dark bg-opacity-75 text-white px-2 py-1 rounded small" style={{ fontSize: '11px' }}>
-                Mapa interactivo · Leaflet / Google Maps
-              </div>
+            <label className="form-label d-block mb-2">
+              Ubicación en el mapa{' '}
+              <span className="fw-normal text-muted">(arrastra el pin o haz clic en el mapa)</span>
+            </label>
+            <MapaDireccion
+              comuna={formData.comuna}
+              coords={formData.coords}
+              onCambiarCoords={manejarCambiarCoords}
+            />
+            <div className="form-text mt-2">
+              {formData.street.trim()
+                ? `${formData.street}, ${formData.comuna}`
+                : `Centrado en ${formData.comuna}`}
             </div>
           </div>
         </div>
