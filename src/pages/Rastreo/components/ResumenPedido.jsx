@@ -3,6 +3,7 @@ const TEXTOS = {
   preparado: { titulo: 'Tu pedido está listo para salir', pill: 'Preparado' },
   'en-camino': { titulo: '¡Tu pedido está en camino!', pill: 'En reparto' },
   entregado: { titulo: 'Tu pedido fue entregado', pill: 'Entregado' },
+  cancelado: { titulo: 'Tu pedido fue cancelado', pill: 'Cancelado' },
 }
 
 const HORARIOS = { am: 'durante la mañana', pm: 'durante la tarde' }
@@ -15,7 +16,7 @@ function sumarMinutos(hora, minutos) {
 }
 
 function Llegada({ pedido }) {
-  if (pedido.estado === 'entregado') return null
+  if (pedido.estado === 'entregado' || pedido.estado === 'cancelado') return null
   const horario = HORARIOS[pedido.direccion?.slot]
   if (horario) {
     return <p className="delivery-time">Llegará <strong>{horario}</strong>.</p>

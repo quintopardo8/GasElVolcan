@@ -91,6 +91,7 @@ export const productosApi = {
 
 export const pedidosApi = {
   listar: ({ estado = '', fecha = '' } = {}) => apiGet(`/api/pedidos${consulta({ estado, fecha })}`),
+  obtener: (id) => apiGet(`/api/pedidos/${id}`),
   crear: (datos) => apiPost('/api/pedidos', datos),
   actualizar: (id, datos) => apiPut(`/api/pedidos/${id}`, datos),
   asignar: (id, repartidorId, repartidorNombre) =>
