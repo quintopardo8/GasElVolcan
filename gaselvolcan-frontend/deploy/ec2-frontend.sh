@@ -3,8 +3,8 @@
 # Despliegue del FRONTEND en una EC2 Ubuntu 24.04 (React compilado + nginx en el puerto 80).
 #
 # Uso (dentro de la EC2, por SSH):
-#   curl -fsSL https://raw.githubusercontent.com/<usuario>/gaselvolcan-frontend/main/deploy/ec2-frontend.sh -o ec2-frontend.sh
-#   bash ec2-frontend.sh https://github.com/<usuario>/gaselvolcan-frontend.git <IP-PRIVADA-BACKEND>
+#   curl -fsSL https://raw.githubusercontent.com/quintopardo8/GasElVolcan/main/gaselvolcan-frontend/deploy/ec2-frontend.sh -o ec2-frontend.sh
+#   bash ec2-frontend.sh https://github.com/quintopardo8/GasElVolcan.git <IP-PRIVADA-BACKEND>
 #
 # Se puede ejecutar de nuevo para actualizar: hace git pull y reconstruye.
 # =============================================================================
@@ -12,7 +12,8 @@ set -euo pipefail
 
 REPO_URL="${1:-${REPO_URL:-}}"
 BACKEND_IP="${2:-${BACKEND_IP:-}}"
-DIR=/opt/gaselvolcan-frontend
+DIR=/opt/gaselvolcan                 # repositorio completo (frontend + backend)
+APP="$DIR/gaselvolcan-frontend"     # carpeta del frontend dentro del repositorio
 
 if [[ -z "$REPO_URL" || -z "$BACKEND_IP" ]]; then
   echo "Uso: bash ec2-frontend.sh <url-repo> <ip-privada-del-backend>" >&2
@@ -42,14 +43,14 @@ else
 fi
 
 echo "==> 4/5 Configurando la dirección del backend ($BACKEND_IP)"
-sudo tee "$DIR/.env" >/dev/null <<ENV
+sudo tee "$APP/.env" >/dev/null <<ENV
 USUARIOS_API=http://${BACKEND_IP}:8081
 PEDIDOS_API=http://${BACKEND_IP}:8082
 FRONTEND_PORT=80
 ENV
 
 echo "==> 5/5 Construyendo y levantando nginx"
-cd "$DIR"
+cd "$APP"
 sudo docker compose up -d --build
 sudo docker compose ps
 

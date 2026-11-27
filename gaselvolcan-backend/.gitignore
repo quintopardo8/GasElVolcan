@@ -1,0 +1,17 @@
+# Compilación de Maven
+target/
+*.jar
+*.class
+
+# Variables de entorno (contienen contraseñas y el secreto JWT)
+.env
+.env.*
+!.env.example
+
+# IDE y sistema
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
